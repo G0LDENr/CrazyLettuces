@@ -1,0 +1,458 @@
+/* Reset y variables */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #22c55e;
+  --primary-dark: #16a34a;
+  --secondary-color: #84cc16;
+  --text-dark: #1e293b;
+  --text-light: #64748b;
+  --background: #ffffff;
+  --background-light: #f0fdf4;
+  --border-color: #bbf7d0;
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --footer-dark: #15803d;
+}
+
+/* Importar Adlery Swash de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Adlery+Swash&display=swap');
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  color: var(--text-dark);
+}
+
+.nosotros {
+  min-height: 100vh;
+}
+
+/* Header (mismo estilo que Home) */
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.nav-brand h2 {
+  color: var(--primary-dark);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Adlery Swash en el header */
+.nav-brand h2 .crazy-swash {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--primary-dark);
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+}
+
+.nav-menu a {
+  text-decoration: none;
+  color: var(--text-dark);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-menu a:hover {
+  color: var(--primary-color);
+}
+
+/* Hero Nosotros */
+.nosotros-hero {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  text-align: center;
+  padding: 120px 2rem 60px;
+  margin-top: 80px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nosotros-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+/* Adlery Swash en el título del hero */
+.nosotros-title .crazy-swash-hero {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 4rem;
+  font-weight: 400;
+  color: white;
+}
+
+.nosotros-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Adlery Swash para texto normal */
+.crazy-swash-text {
+  font-family: 'arial';
+  font-weight: 400;
+}
+
+/* Misión, Visión y Valores */
+.mvv-section {
+  padding: 6rem 2rem;
+  background: var(--background-light);
+}
+
+.mvv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 3rem;
+}
+
+.mvv-card {
+  position: relative;
+  padding: 3rem 2rem;
+  border-radius: 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 2px solid var(--border-color);
+  overflow: hidden;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.mvv-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.8;
+  z-index: 1;
+}
+
+.mision-card .card-background {
+  background-image: url('../img/Crazy_Red.png');
+}
+
+.vision-card .card-background {
+  background-image: url('../img/Crazy_Green.png');
+}
+
+.valores-card .card-background {
+  background-image: url('../img/Crazy_yellow.png');
+}
+
+.card-content {
+  position: relative;
+  z-index: 2;
+}
+
+.mvv-icon-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.mvv-icon {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  border: 3px solid rgba(255, 255, 255, 0.8);
+}
+
+.mvv-icon i {
+  font-size: 3rem;
+  color: var(--text-dark);
+  z-index: 3;
+}
+
+.icon-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0.7;
+  z-index: 2;
+}
+
+/* Colores de texto para cada tarjeta */
+.mision-card .card-content {
+  color: white;
+}
+
+.mision-card .card-content h3 {
+  color: white;
+}
+
+.vision-card .card-content {
+  color: white;
+}
+
+.vision-card .card-content h3 {
+  color: white;
+}
+
+.valores-card .card-content {
+  color: var(--text-dark);
+}
+
+.valores-card .card-content h3 {
+  color: var(--text-dark);
+}
+
+.mvv-card h3 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.mvv-card p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+/* Valores List */
+.valores-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.valor-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.valor-item:hover {
+  transform: translateX(5px);
+}
+
+.valor-item i {
+  color: var(--primary-color);
+  font-size: 1.25rem;
+  width: 30px;
+}
+
+.valor-item span {
+  font-weight: 600;
+}
+
+/* Historia Section */
+.historia-section {
+  padding: 6rem 2rem;
+  background: white;
+}
+
+.historia-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.historia-text h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: var(--text-dark);
+}
+
+.historia-text p {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+}
+
+.historia-image {
+  border-radius: 2rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.historia-image img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+/* Footer (mismo que Home) */
+.footer {
+  background: var(--footer-dark);
+  color: white;
+  padding: 3rem 2rem 1rem;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.footer-section h3,
+.footer-section h4 {
+  margin-bottom: 1rem;
+  color: white;
+}
+
+/* Adlery Swash en el footer */
+.footer-section h3 .crazy-swash {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: white;
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section ul li {
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-section a {
+  color: #bbf7d0;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+  color: white;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid #22c55e;
+  color: #bbf7d0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .nav-menu {
+    gap: 1rem;
+  }
+  
+  .nosotros-title {
+    font-size: 2.5rem;
+  }
+  
+  .nosotros-title .crazy-swash-hero {
+    font-size: 3rem;
+  }
+  
+  .mvv-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .mvv-card {
+    padding: 2rem 1.5rem;
+    min-height: 450px;
+  }
+  
+  .mvv-icon {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .mvv-icon i {
+    font-size: 2.5rem;
+  }
+  
+  .icon-logo {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .historia-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+  
+  .historia-image img {
+    height: 300px;
+  }
+  
+  /* Ajustes responsive para Adlery Swash */
+  .nav-brand h2 .crazy-swash,
+  .footer-section h3 .crazy-swash {
+    font-size: 1.5rem;
+  }
+}
