@@ -1,0 +1,397 @@
+/* config.css */
+.config {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 80px;
+}
+
+/* Header - Mismo diseño que home.css */
+.config-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.config-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.config-nav-brand {
+  display: flex;
+  align-items: center;
+}
+
+.config-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.config-logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.config-nav-brand h2 {
+  color: var(--primary-dark);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Adlery Swash en el header */
+.config-nav-brand h2 .crazy-swash {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--primary-dark);
+}
+
+.config-nav-menu {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+}
+
+.config-nav-menu a {
+  text-decoration: none;
+  color: var(--text-dark);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.config-nav-menu a:hover {
+  color: var(--primary-color);
+}
+
+/* Contenido principal */
+.config-container {
+  flex: 1;
+  padding: 2rem;
+  background: var(--background-light);
+  min-height: 60vh;
+}
+
+.config-title {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.config-title h1 {
+  font-size: 2rem;
+  margin: 0;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.config-title p {
+  margin: 0.5rem 0 0 0;
+  color: var(--text-light);
+  font-size: 1rem;
+}
+
+.config-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 400px;
+}
+
+.config-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  border: 2px solid var(--border-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.config-option:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.config-option h3 {
+  margin: 0;
+  color: var(--text-dark);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.config-toggle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.config-toggle-input {
+  display: none;
+}
+
+.config-toggle-slider {
+  position: relative;
+  width: 50px;
+  height: 24px;
+  background: #ccc;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.config-toggle-slider:before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.config-toggle-input:checked + .config-toggle-slider {
+  background: #036513;
+}
+
+.config-toggle-input:checked + .config-toggle-slider:before {
+  transform: translateX(26px);
+}
+
+.config-toggle-text {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  min-width: 100px;
+  font-weight: 500;
+}
+
+/* Footer - Mismo diseño que home.css */
+.config-footer {
+  background: var(--footer-dark);
+  color: white;
+  padding: 3rem 2rem 1rem;
+}
+
+.config-footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.config-footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.config-footer-section h3,
+.config-footer-section h4 {
+  margin-bottom: 1rem;
+  color: white;
+}
+
+/* Adlery Swash en el footer */
+.config-footer-section h3 .crazy-swash {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: white;
+}
+
+.config-footer-section ul {
+  list-style: none;
+}
+
+.config-footer-section ul li {
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.config-footer-section a {
+  color: #bbf7d0;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.config-footer-section a:hover {
+  color: white;
+}
+
+.config-footer-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.config-footer-logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.config-footer-bottom {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid #22c55e;
+  color: #bbf7d0;
+}
+
+/* Modo oscuro - COMPLETO (header, contenido y footer) */
+.dark-mode .config {
+  background: var(--text-dark);
+}
+
+.dark-mode .config-header {
+  background: rgba(0, 0, 0, 0.95);
+  border-bottom-color: #000000;
+}
+
+.dark-mode .config-nav-brand h2 {
+  color: #ffffff;
+}
+
+.dark-mode .config-nav-brand h2 .crazy-swash {
+  color: #ffffff;
+}
+
+.dark-mode .config-nav-menu a {
+  color: #ffffff;
+}
+
+.dark-mode .config-nav-menu a:hover {
+  color: #1abb01;
+}
+
+.dark-mode .config-container {
+  background: #191919;
+}
+
+.dark-mode .config-title h1 {
+  color: #ffffff;
+}
+
+.dark-mode .config-title p {
+  color: #bdc3c7;
+}
+
+.dark-mode .config-option {
+  background: #212121;
+  border-color: #036513;
+}
+
+.dark-mode .config-option h3 {
+  color: #ffffff;
+}
+
+.dark-mode .config-toggle-text {
+  color: #ffffff;
+}
+
+/* Modo oscuro para el footer */
+.dark-mode .config-footer {
+  background: #185f1f;
+  border-top: 1px solid #185f1f;
+}
+
+.dark-mode .config-footer-section h3,
+.dark-mode .config-footer-section h4 {
+  color: #ffffff;
+}
+
+.dark-mode .config-footer-section h3 .crazy-swash {
+  color: #ffffff;
+}
+
+.dark-mode .config-footer-section ul li {
+  color: #ffffff;
+}
+
+.dark-mode .config-footer-section a {
+  color: #ffffff;
+}
+
+.dark-mode .config-footer-section a:hover {
+  color: #ffffff;
+}
+
+.dark-mode .config-footer-bottom {
+  border-top-color: #ffffff;
+  color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .config {
+    padding-top: 70px;
+  }
+  
+  .config-nav {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .config-nav-menu {
+    gap: 1rem;
+  }
+  
+  .config-container {
+    padding: 1rem;
+  }
+  
+  .config-title h1 {
+    font-size: 1.5rem;
+  }
+  
+  .config-options {
+    max-width: 100%;
+  }
+  
+  .config-option {
+    padding: 1rem;
+  }
+  
+  /* Ajuste responsive para Adlery Swash en header y footer */
+  .config-nav-brand h2 .crazy-swash,
+  .config-footer-section h3 .crazy-swash {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Ajuste para móviles muy pequeños */
+  .config-nav-brand h2 .crazy-swash,
+  .config-footer-section h3 .crazy-swash {
+    font-size: 1.3rem;
+  }
+  
+  .config-toggle {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: flex-start;
+  }
+  
+  .config-toggle-text {
+    min-width: auto;
+  }
+}

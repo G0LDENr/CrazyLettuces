@@ -1,0 +1,284 @@
+/* Contenedor principal */
+.edit-user-form {
+  width: 100%;
+}
+
+.edit-user-form-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Información del usuario */
+.edit-user-info {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 4px solid #007bff;
+  margin-bottom: 1rem;
+}
+
+.edit-user-info h4 {
+  margin: 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+/* Filas del formulario */
+.edit-form-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.edit-form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.edit-form-group-full-width {
+  flex: 0 0 100%;
+}
+
+.edit-form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* Inputs y selects */
+.edit-form-group input,
+.edit-select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.edit-form-group input:focus,
+.edit-select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.edit-input-error,
+.edit-select-error {
+  border-color: #dc3545 !important;
+}
+
+.edit-error-message {
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  min-height: 1rem;
+}
+
+/* Campos de rol y sexo */
+.edit-role-sex-fields {
+  display: flex;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.edit-role-sex-fields .edit-form-group {
+  flex: 1;
+}
+
+/* Nota informativa */
+.edit-info-note {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.edit-info-note p {
+  margin: 0;
+  color: #856404;
+  font-size: 0.9rem;
+}
+
+/* Botones de acción */
+.edit-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.edit-btn-cancel {
+  padding: 0.75rem 1.5rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+  min-width: 120px;
+}
+
+.edit-btn-cancel:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.edit-btn-submit {
+  padding: 0.75rem 1.5rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+  min-width: 120px;
+}
+
+.edit-btn-submit:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.edit-btn-cancel:disabled,
+.edit-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mensaje de éxito */
+.edit-user-success-message {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 12px 16px;
+  border-radius: 4px;
+  border: 1px solid #c3e6cb;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: editFadeIn 0.3s ease-in;
+}
+
+.edit-user-success-message::before {
+  content: "✓";
+  font-weight: bold;
+}
+
+@keyframes editFadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Modo oscuro */
+.edit-user-form-dark-mode .edit-user-info {
+  background-color: #1a1a1a;
+  border-left-color: #D4AF37;
+}
+
+.edit-user-form-dark-mode .edit-user-info h4 {
+  color: #e2e8f0;
+}
+
+.edit-user-form-dark-mode .edit-form-group label {
+  color: #e2e8f0;
+}
+
+.edit-user-form-dark-mode .edit-form-group input,
+.edit-user-form-dark-mode .edit-select {
+  background-color: #1a1a1a;
+  border-color: #333;
+  color: #e2e8f0;
+}
+
+.edit-user-form-dark-mode .edit-form-group input:focus,
+.edit-user-form-dark-mode .edit-select:focus {
+  border-color: #D4AF37;
+}
+
+.edit-user-form-dark-mode .edit-input-error,
+.edit-user-form-dark-mode .edit-select-error {
+  border-color: #dc3545 !important;
+}
+
+.edit-user-form-dark-mode .edit-info-note {
+  background-color: #332701;
+  border-color: #665002;
+}
+
+.edit-user-form-dark-mode .edit-info-note p {
+  color: #e2b014;
+}
+
+.edit-user-form-dark-mode .edit-form-actions {
+  border-top-color: #333;
+}
+
+.edit-user-form-dark-mode .edit-btn-cancel {
+  background-color: #6c757d;
+}
+
+.edit-user-form-dark-mode .edit-btn-cancel:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.edit-user-form-dark-mode .edit-btn-submit {
+  background-color: #28a745;
+}
+
+.edit-user-form-dark-mode .edit-btn-submit:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.edit-user-form-dark-mode .edit-user-success-message {
+  background-color: #1e3a2c;
+  color: #4ade80;
+  border-color: #2d5a3d;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .edit-form-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .edit-role-sex-fields {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .edit-form-actions {
+    flex-direction: column;
+  }
+
+  .edit-btn-cancel,
+  .edit-btn-submit {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-user-form-form {
+    gap: 1rem;
+  }
+  
+  .edit-form-group input,
+  .edit-select {
+    padding: 0.65rem;
+  }
+  
+  .edit-user-info {
+    padding: 0.75rem;
+  }
+}

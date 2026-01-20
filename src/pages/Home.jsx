@@ -1,4 +1,5 @@
 import React from 'react';
+import { useConfig } from '../context/config';
 import '../css/home.css';
 
 import logo from '../img/crazylettuces.png';
@@ -9,111 +10,114 @@ import instagramLogo from '../img/instagram.png';
 import tik_tokLogo from '../img/tik-tok.png';
 
 const Home = () => {
+  const { t } = useConfig();
+
   return (
     <div className="home">
       {/* Header */}
-      <header className="header">
-        <nav className="navbar">
-          <div className="nav-brand">
-            <div className="logo-container">
-              <img src={logo} alt="Crazy Lettuces" className="logo" />
+      <header className="home-header">
+        <nav className="home-nav">
+          <div className="home-nav-brand">
+            <div className="home-logo-container">
+              <img src={logo} alt="Crazy Lettuces" className="home-logo" />
               <h2>
-                <span className="crazy-swash">Crazy</span> Lettuces
+                <span className="home-crazy-swash">Crazy</span> Lettuces
               </h2>
             </div>
           </div>
-          <ul className="nav-menu">
-            <li><a href="#inicio">Inicio</a></li>
-            <li><a href="#productos">Productos</a></li>
-            <li><a href="/nosotros">Nosotros</a></li>
+          <ul className="home-nav-menu">
+            <li><a href="#inicio">{t('inicio')}</a></li>
+            <li><a href="/productos">{t('productos')}</a></li>
+            <li><a href="/nosotros">{t('nosotros')}</a></li>
+            <li><a href="/configuracion">{t('configuracion')}</a></li>
+            <li><a href="/login">{t('login')}</a></li>
           </ul>
         </nav>
       </header>
 
       {/* Hero Section */}
-      <section className="hero" id="inicio">
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1 className="hero-title">
-              <span className="crazy-large-swash">Crazy</span>
-              <span className="highlight"> Lettuces</span>
+      <section className="home-hero" id="inicio">
+        <div className="home-hero-content">
+          <div className="home-hero-text">
+            <h1 className="home-hero-title">
+              <span className="home-crazy-large-swash">Crazy</span>
+              <span className="home-highlight"> Lettuces</span>
             </h1>
-            <p className="hero-description">
-              Las lechugas más locas y deliciosas con chile, gomitas y mucho sabor. 
-              ¡Una experiencia única para tu paladar!
+            <p className="home-hero-description">
+              {t('heroDescription')}
             </p>
           </div>
-          <div className="hero-image">
-            <div className="image-container">
-              <img src={lechuga} alt="Producto Crazy Lettuces" className="product-image" />
-            </div>
+          <div className="home-hero-image">
+            {/* <div className="home-image-container">
+              <img src={lechuga} alt="Producto Crazy Lettuces" className="home-product-image" />
+            </div> */}
           </div>
         </div>
       </section>
 
       {/* Products Section */}
-      <section className="products" id="productos">
-        <div className="container">
-          <h2 className="section-title">Nuestros Productos Locos</h2>
-          <div className="products-grid">
+      <section className="home-products" id="productos">
+        <div className="home-container">
+          <h2 className="home-section-title">{t('productosTitle')}</h2>
+          <div className="home-products-grid">
             
-            <div className="product-card">
-              <div className="product-image-container">
-                <img src={LogoLechuga} alt="Lechugas con Gomitas" className="product-icon-image" />
+            <div className="home-product-card">
+              <div className="home-product-image-container">
+                <img src={LogoLechuga} alt="Lechugas con Gomitas" className="home-product-icon-image" />
               </div>
-              <h3>🥗Combo Fresh</h3>
-              <p>Lechuga crujiente con limón y sal. Simple, ligera y deliciosa.🥬✨</p>
+              <h3>{t('comboFreshName')}</h3>
+              <p>{t('comboFreshDescription')}</p>
             </div>
             
-            <div className="product-card">
-              <div className="product-image-container">
-                <img src={LogoLechuga} alt="Combo Loco" className="product-icon-image" />
+            <div className="home-product-card">
+              <div className="home-product-image-container">
+                <img src={LogoLechuga} alt="Combo Loco" className="home-product-icon-image" />
               </div>
-              <h3>🌶️Crazy Spicy</h3>
-              <p>Chamoy, chile Miguelito y limón sobre lechugas frescas.¡Un toque loco y picante!🔥😋</p>
+              <h3>{t('crazySpicyName')}</h3>
+              <p>{t('crazySpicyDescription')}</p>
             </div>
 
-            <div className="product-card">
-              <div className="product-image-container">
-                <img src={LogoLechuga} alt="Especial Crazy" className="product-icon-image" />
+            <div className="home-product-card">
+              <div className="home-product-image-container">
+                <img src={LogoLechuga} alt="Especial Crazy" className="home-product-icon-image" />
               </div>
-              <h3>😵‍💫Combo Loco</h3>
-              <p>Lechuga con gomitas, cacahuates y topping al gusto.!El sabor mas divertido!🍬🥜</p>
+              <h3>{t('comboLocoName')}</h3>
+              <p>{t('comboLocoDescription')}</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Find Us Section */}
-      <section className="find-us">
-        <div className="container">
-          <div className="find-us-content">
-            <h2>Encuéntranos</h2>
-            <p>Síguenos en nuestras redes sociales para conocer promociones y nuevos productos</p>
-            <div className="social-icons">
+      <section className="home-find-us">
+        <div className="home-container">
+          <div className="home-find-us-content">
+            <h2>{t('encuentranosTitle')}</h2>
+            <p>{t('encuentranosDescription')}</p>
+            <div className="home-social-icons">
               <a 
                 href="https://www.facebook.com/share/1BUz4PdFw8/" 
-                className="social-link"
+                className="home-social-link"
                 target="_blank" 
                 rel="noopener noreferrer"
               >
-                <img src={facebookLogo} alt="Facebook" className="social-logo" />
+                <img src={facebookLogo} alt="Facebook" className="home-social-logo" />
               </a>
               <a 
                 href="https://www.instagram.com/crazy_lettuces?igsh=MW1oZDloZ3I0cDg2MQ==" 
-                className="social-link"
+                className="home-social-link"
                 target="_blank" 
                 rel="noopener noreferrer"
               >
-                <img src={instagramLogo} alt="Instagram" className="social-logo" />
+                <img src={instagramLogo} alt="Instagram" className="home-social-logo" />
               </a>
               <a 
                 href="https://www.tiktok.com/@crazy.lettuce8?_r=1&_t=ZS-91InvRY4cKt" 
-                className="social-link"
+                className="home-social-link"
                 target="_blank" 
                 rel="noopener noreferrer"
               >
-                <img src={tik_tokLogo} alt="TikTok" className="social-logo" />
+                <img src={tik_tokLogo} alt="TikTok" className="home-social-logo" />
               </a>
             </div>
           </div>
@@ -121,37 +125,37 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="footer">
-        <div className="container">
-          <div className="footer-content">
-            <div className="footer-section">
-              <div className="logo-container">
-                <img src={logo} alt="Crazy Lettuces" className="logo" />
+      <footer className="home-footer">
+        <div className="home-container">
+          <div className="home-footer-content">
+            <div className="home-footer-section">
+              <div className="home-footer-logo-container">
+                <img src={logo} alt="Crazy Lettuces" className="home-footer-logo" />
                 <h3>
-                  <span className="crazy-swash">Crazy</span> Lettuces
+                  <span className="home-crazy-swash">Crazy</span> Lettuces
                 </h3>
               </div>
-              <p>Las lechugas más locas y deliciosas de la ciudad.</p>
+              <p>{t('footerDescription')}</p>
             </div>
-            <div className="footer-section">
-              <h4>Productos</h4>
+            <div className="home-footer-section">
+              <h4>{t('productosFooter')}</h4>
               <ul>
-                <li><a href="#productos">Lechugas con Chile</a></li>
-                <li><a href="#productos">Lechugas con Gomitas</a></li>
-                <li><a href="#productos">Combos Locos</a></li>
+                <li><a href="#productos">{t('lechugasChile')}</a></li>
+                <li><a href="#productos">{t('lechugasGomitas')}</a></li>
+                <li><a href="#productos">{t('combosLocos')}</a></li>
               </ul>
             </div>
-            <div className="footer-section">
-              <h4>Contacto</h4>
+            <div className="home-footer-section">
+              <h4>{t('contacto')}</h4>
               <ul>
-                <li><i className="fas fa-map-marker-alt"></i> Mexico, Ciudad de Mexico</li>
-                <li><i className="fas fa-phone"></i> +52 5538986602</li>
-                <li><i className="fas fa-envelope"></i> crazylettuces@gmail.com</li>
+                <li><i className="fas fa-map-marker-alt"></i> {t('direccion')}</li>
+                <li><i className="fas fa-phone"></i> {t('telefono')}</li>
+                <li><i className="fas fa-envelope"></i> {t('email')}</li>
               </ul>
             </div>
           </div>
-          <div className="footer-bottom">
-            <p>&copy; 2024 Crazy Lettuces. Todos los derechos reservados.</p>
+          <div className="home-footer-bottom">
+            <p>{t('derechos')}</p>
           </div>
         </div>
       </footer>

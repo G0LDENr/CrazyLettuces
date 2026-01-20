@@ -1,4 +1,5 @@
 import React from 'react';
+import { useConfig } from '../../context/config';
 import '../../css/nosotros.css';
 
 import logo from '../../img/crazylettuces.png';
@@ -6,184 +7,197 @@ import LechugasLogo from '../../img/lechugas.png';
 import logolechuga from '../../img/lechugalogo.png';
 
 const Nosotros = () => {
+  const { t } = useConfig();
+
   return (
     <div className="nosotros">
-      {/* Header (mismo que el home) */}
-      <header className="header">
-        <nav className="navbar">
-          <div className="nav-brand">
-            <div className="logo-container">
-              <img src={logo} alt="Crazy Lettuces" className="logo" />
+      {/* Header */}
+      <header className="nosotros-header">
+        <nav className="nosotros-nav">
+          <div className="nosotros-nav-brand">
+            <div className="nosotros-logo-container">
+              <img src={logo} alt="Crazy Lettuces" className="nosotros-logo" />
               <h2>
-                <span className="crazy-swash">Crazy</span> Lettuces
+                <span className="nosotros-crazy-swash">Crazy</span> Lettuces
               </h2>
             </div>
           </div>
-          <ul className="nav-menu">
-            <li><a href="/">Inicio</a></li>
-            <li><a href="/#productos">Productos</a></li>
-            <li><a href="#nosotros">Nosotros</a></li>
+          <ul className="nosotros-nav-menu">
+            <li><a href="/">{t('inicio')}</a></li>
+            <li><a href="/#productos">{t('productos')}</a></li>
+            <li><a href="#nosotros">{t('nosotros')}</a></li>
+            <li><a href="/configuracion">{t('configuracion')}</a></li>
+            <li><a href="/login">{t('login')}</a></li>
           </ul>
         </nav>
       </header>
 
       {/* Hero Nosotros */}
       <section className="nosotros-hero">
-        <div className="container">
-          <h1 className="nosotros-title">Sobre <span className="crazy-swash-hero">Crazy</span> Lettuces</h1>
+        <div className="nosotros-container">
+          <h1 className="nosotros-title"> <span className="nosotros-crazy-swash-hero">Crazy</span> Lettuces</h1>
           <p className="nosotros-subtitle">
-            Conoce más sobre <span className="crazy-swash-text">Crazy</span> Lettuces y nuestra pasión por crear experiencias únicas
+           <span className="nosotros-crazy-swash-text">Crazy</span> Lettuces {t('yNuestraPasion')}
           </p>
         </div>
       </section>
 
       {/* Misión, Visión y Valores */}
-      <section className="mvv-section">
-        <div className="container">
-          <div className="mvv-grid">
+      <section className="nosotros-mvv-section">
+        <div className="nosotros-container">
+          <div className="nosotros-mvv-grid">
+
             {/* Misión */}
-            <div className="mvv-card mision-card">
-              <div className="card-background"></div>
-              <div className="card-content">
-                <div className="mvv-icon-container">
-                  <div className="mvv-icon">
+            <div className="nosotros-mvv-card nosotros-mision-card">
+              <div className="nosotros-card-background"></div>
+              <div className="nosotros-card-content">
+                <div className="nosotros-mvv-icon-container">
+                  <div className="nosotros-mvv-icon">
                     <i className="fas fa-bullseye"></i>
-                    <img src={logolechuga} alt="Logo Crazy Lettuces" className="icon-logo" />
+                    <img src={logolechuga} alt="Logo Crazy Lettuces" className="nosotros-icon-logo" />
                   </div>
                 </div>
-                <h3>Misión</h3>
+                <h3>{t('mision')}</h3>
                 <p>
-                  Somos una empresa dedicada a la elaboración de <span className="crazy-swash-text">Crazy</span> Lettuces, Lechugas 
-                  sembradas, tratadas y cosechadas por los estudiantes de la UTVT, siendo este 
-                  un producto natural, saludable y ecologico sin quimicos ni conservadores, 
-                  asegurando el consumo saludable de nuestros clientes
+                  {t('misionTexto')}
                 </p>
               </div>
             </div>
 
             {/* Visión */}
-            <div className="mvv-card vision-card">
-              <div className="card-background"></div>
-              <div className="card-content">
-                <div className="mvv-icon-container">
-                  <div className="mvv-icon">
+            <div className="nosotros-mvv-card nosotros-vision-card">
+              <div className="nosotros-card-background"></div>
+              <div className="nosotros-card-content">
+                <div className="nosotros-mvv-icon-container">
+                  <div className="nosotros-mvv-icon">
                     <i className="fas fa-eye"></i>
-                    <img src={logolechuga} alt="Logo Crazy Lettuces" className="icon-logo" />
+                    <img src={logolechuga} alt="Logo Crazy Lettuces" className="nosotros-icon-logo" />
                   </div>
                 </div>
-                <h3>Visión</h3>
+                <h3>{t('vision')}</h3>
                 <p>
-                  Esperamos ser una empresa de Lechugas preparadas para nuestra comunidad 
-                  estudiantil, esperando ofrecer sabor y frescura, logrando satisfacer a 
-                  nuestros clientes y aumentar nuestras ventas.
+                  {t('visionTexto')}
                 </p>
               </div>
             </div>
 
             {/* Valores */}
-            <div className="mvv-card valores-card">
-              <div className="card-background"></div>
-              <div className="card-content">
-                <div className="mvv-icon-container">
-                  <div className="mvv-icon">
+            <div className="nosotros-mvv-card nosotros-valores-card">
+              <div className="nosotros-card-background"></div>
+              <div className="nosotros-card-content">
+                <div className="nosotros-mvv-icon-container">
+                  <div className="nosotros-mvv-icon">
                     <i className="fas fa-heart"></i>
-                    <img src={logolechuga} alt="Logo Crazy Lettuces" className="icon-logo" />
+                    <img src={logolechuga} alt="Logo Crazy Lettuces" className="nosotros-icon-logo" />
                   </div>
                 </div>
-                <h3>Valores</h3>
-                <div className="valores-list">
-                  <div className="valor-item">
+                <h3>{t('valores')}</h3>
+                <div className="nosotros-valores-list">
+                  <div className="nosotros-valor-item">
                     <i className="fas fa-star"></i>
-                    <span>Calidad</span>
+                    <span>{t('calidad')}</span>
                   </div>
-                  <div className="valor-item">
+                  <div className="nosotros-valor-item">
                     <i className="fas fa-lightbulb"></i>
-                    <span>Responsabilidad Ambiental</span>
+                    <span>{t('responsabilidadAmbiental')}</span>
                   </div>
-                  <div className="valor-item">
+                  <div className="nosotros-valor-item">
                     <i className="fas fa-laugh"></i>
-                    <span>Honestidad</span>
+                    <span>{t('honestidad')}</span>
                   </div>
-                  <div className="valor-item">
+                  <div className="nosotros-valor-item">
                     <i className="fas fa-users"></i>
-                    <span>Compromiso con la salud</span>
+                    <span>{t('compromisoSalud')}</span>
                   </div>
-                  <div className="valor-item">
+                  <div className="nosotros-valor-item">
                     <i className="fas fa-thumbs-up"></i>
-                    <span>Responsabilidad Social</span>
+                    <span>{t('responsabilidadSocial')}</span>
                   </div>
-                  <div className="valor-item">
+                  <div className="nosotros-valor-item">
                     <i className="fas fa-handshake"></i>
-                    <span>Cuidado con el Cliente</span>
+                    <span>{t('cuidadoCliente')}</span>
                   </div>
-                  <div className="valor-item">
+                  <div className="nosotros-valor-item">
                     <i className="fas fa-seedling"></i>
-                    <span>Atencion al Cliente</span>
+                    <span>{t('atencionCliente')}</span>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* Metas */}
+            <div className="nosotros-mvv-card nosotros-metas-card">
+              <div className="nosotros-card-background"></div>
+              <div className="nosotros-card-content">
+                <div className="nosotros-mvv-icon-container">
+                  <div className="nosotros-mvv-icon">
+                    <i className="fas fa-eye"></i>
+                    <img src={logolechuga} alt="Logo Crazy Lettuces" className="nosotros-icon-logo" />
+                  </div>
+                </div>
+                <h3>{t('metas')}</h3>
+                <p>
+                  {t('metasTexto')}
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* Resto del código se mantiene igual */}
       {/* Historia */}
-      <section className="historia-section">
-        <div className="container">
-          <div className="historia-content">
-            <div className="historia-text">
-              <h2>Nuestra Historia</h2>
+      <section className="nosotros-historia-section">
+        <div className="nosotros-container">
+          <div className="nosotros-historia-content">
+            <div className="nosotros-historia-text">
+              <h2>{t('nuestraHistoria')}</h2>
               <p>
-                <span className="crazy-swash-text">Crazy</span> Lettuces nació de la idea de revolucionar el concepto de snacks 
-                saludables. Comenzamos con una simple pregunta: ¿por qué no combinar 
-                lo fresco de las lechugas con lo divertido de los toppings?
+                <span className="nosotros-crazy-swash-text">Crazy</span> Lettuces {t('historiaTexto1')}
               </p>
               <p>
-                Hoy, somos mucho más que una marca de lechugas. Somos creadores de 
-                experiencias, artistas del sabor y apasionados por hacer que cada 
-                comida sea una aventura memorable.
+                {t('historiaTexto2')}
               </p>
             </div>
-            <div className="historia-image">
+            <div className="nosotros-historia-image">
               <img src={LechugasLogo} alt="Nuestra Historia" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer (mismo que el home) */}
-      <footer className="footer">
-        <div className="container">
-          <div className="footer-content">
-            <div className="footer-section">
-              <div className="logo-container">
-                <img src={logo} alt="Crazy Lettuces" className="logo" />
+      {/* Footer */}
+      <footer className="nosotros-footer">
+        <div className="nosotros-container">
+          <div className="nosotros-footer-content">
+            <div className="nosotros-footer-section">
+              <div className="nosotros-footer-logo-container">
+                <img src={logo} alt="Crazy Lettuces" className="nosotros-footer-logo" />
                 <h3>
-                  <span className="crazy-swash">Crazy</span> Lettuces
+                  <span className="nosotros-crazy-swash">Crazy</span> Lettuces
                 </h3>
               </div>
-              <p>Las lechugas más locas y deliciosas de la ciudad.</p>
+              <p>{t('footerDescription')}</p>
             </div>
-            <div className="footer-section">
-              <h4>Productos</h4>
+            <div className="nosotros-footer-section">
+              <h4>{t('productosFooter')}</h4>
               <ul>
-                <li><a href="/#productos">Lechugas con Chile</a></li>
-                <li><a href="/#productos">Lechugas con Gomitas</a></li>
-                <li><a href="/#productos">Combos Locos</a></li>
+                <li><a href="/#productos">{t('lechugasChile')}</a></li>
+                <li><a href="/#productos">{t('lechugasGomitas')}</a></li>
+                <li><a href="/#productos">{t('combosLocos')}</a></li>
               </ul>
             </div>
-            <div className="footer-section">
-              <h4>Contacto</h4>
+            <div className="nosotros-footer-section">
+              <h4>{t('contacto')}</h4>
               <ul>
-                <li><i className="fas fa-map-marker-alt"></i> Ciudad, Estado</li>
-                <li><i className="fas fa-phone"></i> +1 234 567 890</li>
-                <li><i className="fas fa-envelope"></i> hola@crazylettuces.com</li>
+                <li><i className="fas fa-map-marker-alt"></i> {t('direccion')}</li>
+                <li><i className="fas fa-phone"></i> {t('telefono')}</li>
+                <li><i className="fas fa-envelope"></i> {t('email')}</li>
               </ul>
             </div>
           </div>
-          <div className="footer-bottom">
-            <p>&copy; 2024 <span className="crazy-swash-text">Crazy</span> Lettuces. Todos los derechos reservados.</p>
+          <div className="nosotros-footer-bottom">
+            <p>{t('derechos')}</p>
           </div>
         </div>
       </footer>

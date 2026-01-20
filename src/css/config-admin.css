@@ -1,0 +1,169 @@
+/* config-admin.css */
+.config-admin-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--background-light);
+  transition: all 0.3s ease;
+}
+
+/* Contenido principal */
+.config-admin-content {
+  flex: 1;
+  padding: 2rem;
+  background: var(--background-light);
+  min-height: 60vh;
+}
+
+.config-admin-title {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.config-admin-title h1 {
+  font-size: 2rem;
+  margin: 0;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.config-admin-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 400px;
+}
+
+.config-admin-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  border: 2px solid var(--border-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.config-admin-option:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.config-admin-option h3 {
+  margin: 0;
+  color: var(--text-dark);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.config-admin-toggle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.config-admin-toggle-input {
+  display: none;
+}
+
+.config-admin-toggle-slider {
+  position: relative;
+  width: 50px;
+  height: 24px;
+  background: #ccc;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.config-admin-toggle-slider:before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.config-admin-toggle-input:checked + .config-admin-toggle-slider {
+  background: #036513;
+}
+
+.config-admin-toggle-input:checked + .config-admin-toggle-slider:before {
+  transform: translateX(26px);
+}
+
+.config-admin-toggle-text {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  min-width: 100px;
+  font-weight: 500;
+}
+
+/* Modo oscuro COMPLETO */
+.dark-mode.config-admin-container {
+  background: #191919;
+}
+
+.dark-mode .config-admin-content {
+  background: #191919;
+}
+
+.dark-mode .config-admin-title h1 {
+  color: #ffffff;
+}
+
+.dark-mode .config-admin-title {
+  border-bottom-color: #036513;
+}
+
+.dark-mode .config-admin-option {
+  background: #212121;
+  border-color: #036513;
+}
+
+.dark-mode .config-admin-option h3 {
+  color: #ffffff;
+}
+
+.dark-mode .config-admin-toggle-text {
+  color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .config-admin-content {
+    padding: 1rem;
+  }
+  
+  .config-admin-title h1 {
+    font-size: 1.5rem;
+  }
+  
+  .config-admin-options {
+    max-width: 100%;
+  }
+  
+  .config-admin-option {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .config-admin-toggle {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: flex-start;
+  }
+  
+  .config-admin-toggle-text {
+    min-width: auto;
+  }
+}

@@ -1,3 +1,5 @@
+/* nosotros.css - Versión Corregida con tu Modo Oscuro Original */
+
 /* Reset y variables */
 * {
   margin: 0;
@@ -19,9 +21,6 @@
   --footer-dark: #15803d;
 }
 
-/* Importar Adlery Swash de Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Adlery+Swash&display=swap');
-
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.6;
@@ -30,10 +29,13 @@ body {
 
 .nosotros {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
 }
 
-/* Header (mismo estilo que Home) */
-.header {
+/* Header */
+.nosotros-header {
   position: fixed;
   top: 0;
   width: 100%;
@@ -43,7 +45,7 @@ body {
   border-bottom: 1px solid var(--border-color);
 }
 
-.navbar {
+.nosotros-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -52,47 +54,47 @@ body {
   margin: 0 auto;
 }
 
-.logo-container {
+.nosotros-logo-container {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.logo {
+.nosotros-logo {
   width: 50px;
   height: 50px;
   border-radius: 8px;
   object-fit: cover;
 }
 
-.nav-brand h2 {
+.nosotros-nav-brand h2 {
   color: var(--primary-dark);
   font-size: 1.5rem;
   font-weight: 700;
 }
 
 /* Adlery Swash en el header */
-.nav-brand h2 .crazy-swash {
+.nosotros-nav-brand h2 .nosotros-crazy-swash {
   font-family: 'Brush Script MT', cursive;
   font-size: 1.8rem;
   font-weight: 400;
   color: var(--primary-dark);
 }
 
-.nav-menu {
+.nosotros-nav-menu {
   display: flex;
   list-style: none;
   gap: 2rem;
 }
 
-.nav-menu a {
+.nosotros-nav-menu a {
   text-decoration: none;
   color: var(--text-dark);
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
-.nav-menu a:hover {
+.nosotros-nav-menu a:hover {
   color: var(--primary-color);
 }
 
@@ -102,11 +104,10 @@ body {
   color: white;
   text-align: center;
   padding: 120px 2rem 60px;
-  margin-top: 80px;
 }
 
-.container {
-  max-width: 1200px;
+.nosotros-container {
+  max-width: 1500px;
   margin: 0 auto;
 }
 
@@ -118,7 +119,7 @@ body {
 }
 
 /* Adlery Swash en el título del hero */
-.nosotros-title .crazy-swash-hero {
+.nosotros-title .nosotros-crazy-swash-hero {
   font-family: 'Brush Script MT', cursive;
   font-size: 4rem;
   font-weight: 400;
@@ -132,27 +133,21 @@ body {
   margin: 0 auto;
 }
 
-/* Adlery Swash para texto normal */
-.crazy-swash-text {
-  font-family: 'arial';
-  font-weight: 400;
-}
-
 /* Misión, Visión y Valores */
-.mvv-section {
-  padding: 6rem 2rem;
+.nosotros-mvv-section {
+  padding: 5rem 2rem;
   background: var(--background-light);
 }
 
-.mvv-grid {
+.nosotros-mvv-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 3rem;
+  gap: 2rem;
 }
 
-.mvv-card {
+.nosotros-mvv-card {
   position: relative;
-  padding: 3rem 2rem;
+  padding: 5rem 2rem;
   border-radius: 1.5rem;
   text-align: center;
   box-shadow: var(--shadow);
@@ -163,14 +158,15 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  background: white;
 }
 
-.mvv-card:hover {
+.nosotros-mvv-card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
 }
 
-.card-background {
+.nosotros-card-background {
   position: absolute;
   top: 0;
   left: 0;
@@ -182,30 +178,34 @@ body {
   z-index: 1;
 }
 
-.mision-card .card-background {
+.nosotros-mision-card .nosotros-card-background {
   background-image: url('../img/Crazy_Red.png');
 }
 
-.vision-card .card-background {
+.nosotros-vision-card .nosotros-card-background {
   background-image: url('../img/Crazy_Green.png');
 }
 
-.valores-card .card-background {
+.nosotros-valores-card .nosotros-card-background {
   background-image: url('../img/Crazy_yellow.png');
 }
 
-.card-content {
+.nosotros-metas-card .nosotros-card-background {
+  background-image: url('../img/Crazy_Green.png');
+}
+
+.nosotros-card-content {
   position: relative;
   z-index: 2;
 }
 
-.mvv-icon-container {
+.nosotros-mvv-icon-container {
   display: flex;
   justify-content: center;
   margin-bottom: 2rem;
 }
 
-.mvv-icon {
+.nosotros-mvv-icon {
   position: relative;
   width: 120px;
   height: 120px;
@@ -218,13 +218,13 @@ body {
   border: 3px solid rgba(255, 255, 255, 0.8);
 }
 
-.mvv-icon i {
+.nosotros-mvv-icon i {
   font-size: 3rem;
   color: var(--text-dark);
   z-index: 3;
 }
 
-.icon-logo {
+.nosotros-icon-logo {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -237,222 +237,393 @@ body {
   z-index: 2;
 }
 
-/* Colores de texto para cada tarjeta */
-.mision-card .card-content {
+/* Colores de texto para cada tarjeta - MODO CLARO */
+.nosotros-mision-card .nosotros-card-content {
   color: white;
 }
 
-.mision-card .card-content h3 {
+.nosotros-mision-card .nosotros-card-content h3 {
   color: white;
 }
 
-.vision-card .card-content {
+.nosotros-vision-card .nosotros-card-content {
   color: white;
 }
 
-.vision-card .card-content h3 {
+.nosotros-vision-card .nosotros-card-content h3 {
   color: white;
 }
 
-.valores-card .card-content {
+.nosotros-valores-card .nosotros-card-content {
   color: var(--text-dark);
 }
 
-.valores-card .card-content h3 {
+.nosotros-valores-card .nosotros-card-content h3 {
   color: var(--text-dark);
 }
 
-.mvv-card h3 {
+.nosotros-metas-card .nosotros-card-content h3 {
+  color: white;
+}
+
+.nosotros-metas-card .nosotros-card-content {
+  color: white;
+}
+
+.nosotros-mvv-card h3 {
   font-size: 2rem;
   margin-bottom: 1.5rem;
 }
 
-.mvv-card p {
+.nosotros-mvv-card p {
   font-size: 1.1rem;
   line-height: 1.8;
+  color: var(--text-dark);
 }
 
 /* Valores List */
-.valores-list {
+.nosotros-valores-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.valor-item {
+.nosotros-valor-item {
   display: flex;
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 0.75rem;
   transition: transform 0.3s ease;
+  border: 1px solid var(--border-color);
 }
 
-.valor-item:hover {
+.nosotros-valor-item:hover {
   transform: translateX(5px);
 }
 
-.valor-item i {
+.nosotros-valor-item i {
   color: var(--primary-color);
   font-size: 1.25rem;
   width: 30px;
 }
 
-.valor-item span {
+.nosotros-valor-item span {
   font-weight: 600;
+  color: var(--text-dark);
 }
 
 /* Historia Section */
-.historia-section {
+.nosotros-historia-section {
   padding: 6rem 2rem;
   background: white;
 }
 
-.historia-content {
+.nosotros-historia-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4rem;
   align-items: center;
 }
 
-.historia-text h2 {
+.nosotros-historia-text h2 {
   font-size: 2.5rem;
   margin-bottom: 2rem;
   color: var(--text-dark);
 }
 
-.historia-text p {
+.nosotros-historia-text p {
   font-size: 1.1rem;
   color: var(--text-light);
   margin-bottom: 1.5rem;
   line-height: 1.8;
 }
 
-.historia-image {
+.nosotros-historia-image {
   border-radius: 2rem;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
 }
 
-.historia-image img {
+.nosotros-historia-image img {
   width: 100%;
   height: 400px;
   object-fit: cover;
 }
 
-/* Footer (mismo que Home) */
-.footer {
+/* Footer */
+.nosotros-footer {
   background: var(--footer-dark);
   color: white;
   padding: 3rem 2rem 1rem;
 }
 
-.footer-content {
+.nosotros-footer-content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 2rem;
   margin-bottom: 2rem;
 }
 
-.footer-section h3,
-.footer-section h4 {
+.nosotros-footer-section h3,
+.nosotros-footer-section h4 {
   margin-bottom: 1rem;
   color: white;
 }
 
 /* Adlery Swash en el footer */
-.footer-section h3 .crazy-swash {
+.nosotros-footer-section h3 .nosotros-crazy-swash {
   font-family: 'Brush Script MT', cursive;
   font-size: 1.8rem;
   font-weight: 400;
   color: white;
 }
 
-.footer-section ul {
+.nosotros-footer-section ul {
   list-style: none;
 }
 
-.footer-section ul li {
+.nosotros-footer-section ul li {
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.footer-section a {
+.nosotros-footer-section a {
   color: #bbf7d0;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
-.footer-section a:hover {
+.nosotros-footer-section a:hover {
   color: white;
 }
 
-.footer-bottom {
+.nosotros-footer-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.nosotros-footer-logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.nosotros-footer-bottom {
   text-align: center;
   padding-top: 2rem;
   border-top: 1px solid #22c55e;
   color: #bbf7d0;
 }
 
+/* ========== MODO OSCURO ORIGINAL ========== */
+.dark-mode .nosotros {
+  background: var(--text-dark);
+}
+
+.dark-mode .nosotros-header {
+  background: rgba(0, 0, 0, 0.95);
+  border-bottom-color: #000000;
+}
+
+.dark-mode .nosotros-nav-brand h2 {
+  color: #1abb01;
+}
+
+.dark-mode .nosotros-nav-brand h2 .nosotros-crazy-swash {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-nav-menu a {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-nav-menu a:hover {
+  color: #1abb01;
+}
+
+.dark-mode .nosotros-hero {
+  background: linear-gradient(135deg, #185f1f, #185f1f);
+}
+
+.dark-mode .nosotros-mvv-section {
+  background: #191919;
+}
+
+.dark-mode .nosotros-mvv-card {
+  background: #212121;
+  border-color: #036513;
+}
+
+.dark-mode .nosotros-mision-card .nosotros-card-content,
+.dark-mode .nosotros-vision-card .nosotros-card-content {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-mision-card .nosotros-card-content h3,
+.dark-mode .nosotros-vision-card .nosotros-card-content h3 {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-valores-card .nosotros-card-content {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-valores-card .nosotros-card-content h3 {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-mvv-card p {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-valor-item {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .nosotros-valor-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.dark-mode .nosotros-valor-item i {
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .nosotros-valor-item span {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-historia-section {
+  background: #191919;
+}
+
+.dark-mode .nosotros-historia-text h2 {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-historia-text p {
+  color: #bdc3c7;
+}
+
+/* Modo oscuro para el footer */
+.dark-mode .nosotros-footer {
+  background: #185f1f;
+  border-top: 1px solid #185f1f;
+}
+
+.dark-mode .nosotros-footer-section h3,
+.dark-mode .nosotros-footer-section h4 {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-footer-section h3 .nosotros-crazy-swash {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-footer-section ul li {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-footer-section a {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-footer-section a:hover {
+  color: #ffffff;
+}
+
+.dark-mode .nosotros-footer-bottom {
+  border-top-color: #ffffff;
+  color: #ffffff;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
-  .navbar {
+  .nosotros {
+    padding-top: 70px;
+  }
+  
+  .nosotros-nav {
     flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .nosotros-nav-menu {
     gap: 1rem;
   }
   
-  .nav-menu {
-    gap: 1rem;
+  .nosotros-hero {
+    padding: 80px 1rem 40px;
   }
   
   .nosotros-title {
     font-size: 2.5rem;
   }
   
-  .nosotros-title .crazy-swash-hero {
+  .nosotros-title .nosotros-crazy-swash-hero {
     font-size: 3rem;
   }
   
-  .mvv-grid {
+  .nosotros-mvv-grid {
     grid-template-columns: 1fr;
     gap: 2rem;
   }
   
-  .mvv-card {
+  .nosotros-mvv-card {
     padding: 2rem 1.5rem;
     min-height: 450px;
   }
   
-  .mvv-icon {
+  .nosotros-mvv-icon {
     width: 100px;
     height: 100px;
   }
   
-  .mvv-icon i {
+  .nosotros-mvv-icon i {
     font-size: 2.5rem;
   }
   
-  .icon-logo {
+  .nosotros-icon-logo {
     width: 35px;
     height: 35px;
   }
   
-  .historia-content {
+  .nosotros-historia-content {
     grid-template-columns: 1fr;
     gap: 2rem;
     text-align: center;
   }
   
-  .historia-image img {
+  .nosotros-historia-image img {
     height: 300px;
   }
   
-  /* Ajustes responsive para Adlery Swash */
-  .nav-brand h2 .crazy-swash,
-  .footer-section h3 .crazy-swash {
+  .nosotros-nav-brand h2 .nosotros-crazy-swash,
+  .nosotros-footer-section h3 .nosotros-crazy-swash {
     font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nosotros-nav-brand h2 .nosotros-crazy-swash,
+  .nosotros-footer-section h3 .nosotros-crazy-swash {
+    font-size: 1.3rem;
+  }
+  
+  .nosotros-title {
+    font-size: 2rem;
+  }
+  
+  .nosotros-title .nosotros-crazy-swash-hero {
+    font-size: 2.2rem;
   }
 }

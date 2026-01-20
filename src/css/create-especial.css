@@ -1,0 +1,296 @@
+/* Contenedor principal */
+.create-especial-form {
+  width: 100%;
+}
+
+.create-especial-form-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Filas del formulario */
+.create-form-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.create-form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.create-form-group-full-width {
+  flex: 0 0 100%;
+}
+
+.create-form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* Inputs, textareas y selects */
+.create-form-group input,
+.create-select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.create-form-group input:focus,
+.create-select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.create-input-error,
+.create-select-error {
+  border-color: #dc3545 !important;
+}
+
+.create-error-message {
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  min-height: 1rem;
+}
+
+/* Contenedor de ingredientes */
+.ingredientes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ingrediente-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ingrediente-row .create-select {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.remove-ingrediente-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.remove-ingrediente-btn:hover {
+  background: #c82333;
+  transform: scale(1.05);
+}
+
+/* Campos de precio y estado */
+.create-price-status-fields {
+  display: flex;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.create-price-status-fields .create-form-group {
+  flex: 1;
+}
+
+/* Botones de acción */
+.create-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.create-btn-cancel {
+  padding: 0.75rem 1.5rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+  min-width: 120px;
+}
+
+.create-btn-cancel:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.create-btn-submit {
+  padding: 0.75rem 1.5rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+  min-width: 120px;
+}
+
+.create-btn-submit:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.create-btn-cancel:disabled,
+.create-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mensaje de éxito */
+.create-success-message {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 12px 16px;
+  border-radius: 4px;
+  border: 1px solid #c3e6cb;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: createFadeIn 0.3s ease-in;
+}
+
+.create-success-message::before {
+  content: "✓";
+  font-weight: bold;
+}
+
+@keyframes createFadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Modo oscuro */
+.create-especial-form-dark-mode .create-form-group label {
+  color: #e2e8f0;
+}
+
+.create-especial-form-dark-mode .create-form-group input,
+.create-especial-form-dark-mode .create-select {
+  background-color: #1a1a1a;
+  border-color: #333;
+  color: #e2e8f0;
+}
+
+.create-especial-form-dark-mode .create-form-group input:focus,
+.create-especial-form-dark-mode .create-select:focus {
+  border-color: #D4AF37;
+}
+
+.create-especial-form-dark-mode .create-input-error,
+.create-especial-form-dark-mode .create-select-error {
+  border-color: #dc3545 !important;
+}
+
+.create-especial-form-dark-mode .create-form-actions {
+  border-top-color: #333;
+}
+
+.create-especial-form-dark-mode .create-btn-cancel {
+  background-color: #6c757d;
+}
+
+.create-especial-form-dark-mode .create-btn-cancel:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.create-especial-form-dark-mode .create-btn-submit {
+  background-color: #D4AF37;
+  color: #000000;
+}
+
+.create-especial-form-dark-mode .create-btn-submit:hover:not(:disabled) {
+  background-color: #b8941f;
+}
+
+.create-especial-form-dark-mode .create-success-message {
+  background-color: #1e3a2c;
+  color: #4ade80;
+  border-color: #2d5a3d;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .create-form-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .create-price-status-fields {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .ingrediente-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .remove-ingrediente-btn {
+    align-self: flex-start;
+    width: auto;
+    padding: 0.5rem 1rem;
+  }
+
+  .create-form-actions {
+    flex-direction: column;
+  }
+
+  .create-btn-cancel,
+  .create-btn-submit {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .create-especial-form-form {
+    gap: 1rem;
+  }
+  
+  .create-form-group input,
+  .create-select {
+    padding: 0.65rem;
+  }
+}
