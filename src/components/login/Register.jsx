@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash, faGlobe, faSun, faMoon, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faGlobe, faSun, faMoon, faArrowLeft, faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { IoNotificationsCircle } from "react-icons/io5";
 import Logo from "../../img/crazylettuces.png";
 import '../../css/register.css';
 
@@ -21,6 +22,18 @@ const Register = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [language, setLanguage] = useState('es');
     const [darkMode, setDarkMode] = useState(false);
+
+    // Verificar si el usuario está autenticado
+    const isAuthenticated = localStorage.getItem('token') !== null;
+
+    // Función para cerrar sesión
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('userData');
+        navigate('/'); // Redirigir a Home
+        window.location.reload(); // Recargar para actualizar el estado
+    };
 
     // Efecto para aplicar el modo oscuro al body
     useEffect(() => {
@@ -64,9 +77,9 @@ const Register = () => {
             confirmPasswordPlaceholder: "••••••••",
             phone: "Teléfono",
             phonePlaceholder: "1234567890",
-            gender: "Género",
+            gender: "Sexo",
             genderOptions: {
-                select: "Seleccionar género",
+                select: "Seleccionar Sexo",
                 M: "Masculino",
                 F: "Femenino",
             },
@@ -82,7 +95,9 @@ const Register = () => {
             close: "Cerrar",
             darkMode: "Modo oscuro",
             lightMode: "Modo claro",
-            back: "Regresar"
+            back: "Regresar",
+            logout: "Cerrar Sesión",
+            myProfile: "Mi Perfil"
         },
         en: {
             title: "Create Account",
@@ -96,9 +111,9 @@ const Register = () => {
             confirmPasswordPlaceholder: "••••••••",
             phone: "Phone",
             phonePlaceholder: "1234567890",
-            gender: "Gender",
+            gender: "Sex",
             genderOptions: {
-                select: "Select gender",
+                select: "Select sex",
                 M: "Male",
                 F: "Female",
             },
@@ -114,7 +129,9 @@ const Register = () => {
             close: "Close",
             darkMode: "Dark mode",
             lightMode: "Light mode",
-            back: "Back"
+            back: "Back",
+            logout: "Logout",
+            myProfile: "My Profile"
         }
     };
 
@@ -206,19 +223,7 @@ const Register = () => {
 
     return (
         <div className={`register-wrapper ${darkMode ? 'dark-mode' : ''}`}>
-            {/* Botón de modo oscuro/claro - IZQUIERDA */}
-            <div className="theme-switcher">
-                <button 
-                    type="button" 
-                    className="theme-button"
-                    onClick={toggleDarkMode}
-                    title={darkMode ? t.lightMode : t.darkMode}
-                >
-                    <FontAwesomeIcon icon={darkMode ? faSun : faMoon} />
-                </button>
-            </div>
-
-            {/* Botones de la derecha: Regresar e Idioma */}
+            {/* Botones de la derecha: Icono de perfil y Cerrar sesión */}
             <div className="right-buttons-container">
                 {/* Botón de regresar - DERECHA */}
                 <div className="back-button-container">
@@ -232,6 +237,43 @@ const Register = () => {
                         <span>{t.back}</span>
                     </button>
                 </div>
+
+                {/* Icono de perfil SIEMPRE visible - DERECHA */}
+                <div className="profile-icon-container">
+                    <button 
+                        type="button" 
+                        className="profile-icon-button"
+                        onClick={() => navigate('/perfil')}
+                        title={t.myProfile}
+                    >
+                        <FontAwesomeIcon icon={faUserCircle} size="2x" />
+                    </button>
+                </div>
+
+                <div className="profile-icon-container">
+                    <button 
+                        type="button" 
+                        className="profile-icon-button"
+                        onClick={() => navigate('/notificacionesUser')}
+                        title={t.myProfile}
+                    >
+                        <IoNotificationsCircle className="profile-icon" />
+                    </button>
+                </div>
+
+                {/* Botón de cerrar sesión - Solo visible si está autenticado - DERECHA */}
+                {isAuthenticated && (
+                    <div className="logout-button-container">
+                        <button 
+                            type="button" 
+                            className="logout-button"
+                            onClick={handleLogout}
+                            title={t.logout}
+                        >
+                            <span>{t.logout}</span>
+                        </button>
+                    </div>
+                )}
 
                 {/* Botón de cambio de idioma - DERECHA */}
                 <div className="language-switcher">
@@ -247,6 +289,18 @@ const Register = () => {
                         </span>
                     </button>
                 </div>
+            </div>
+
+            {/* Botón de modo oscuro/claro - IZQUIERDA */}
+            <div className="theme-switcher">
+                <button 
+                    type="button" 
+                    className="theme-button"
+                    onClick={toggleDarkMode}
+                    title={darkMode ? t.lightMode : t.darkMode}
+                >
+                    <FontAwesomeIcon icon={darkMode ? faSun : faMoon} />
+                </button>
             </div>
 
             <div className="register-container">

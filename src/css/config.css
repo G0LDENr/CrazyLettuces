@@ -339,6 +339,209 @@
   color: #ffffff;
 }
 
+/* ================================
+   ESTILOS PARA EL ICONO DE PERFIL EN EL MENÚ
+   ================================ */
+
+.nav-profile-icon {
+  display: flex;
+  align-items: center;
+  margin-left: 0;
+  padding: 0;
+}
+
+.nav-profile-icon a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  padding: 6px;
+  border-radius: 50%;
+  background: transparent;
+  width: 50px;
+  height: 50px;
+}
+
+.nav-profile-icon a:hover {
+  transform: scale(1.05);
+  background: transparent;
+}
+
+.profile-icon {
+  font-size: 46px;
+  color: inherit;
+  transition: color 0.3s ease;
+}
+
+.nav-profile-icon a:hover .profile-icon {
+  color: inherit;
+  opacity: 0.8;
+}
+
+/* ================================
+   ESTILOS PARA EL BOTÓN DE CERRAR SESIÓN
+   ================================ */
+
+.config-logout-btn {
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.config-logout-btn:hover {
+  background-color: #c53030;
+  transform: translateY(-1px);
+}
+
+/* ================================
+   ESTILOS GENERALES DEL MENÚ
+   ================================ */
+
+.config-nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.config-nav-menu li {
+  display: flex;
+  align-items: center;
+}
+
+.config-nav-menu li a {
+  text-decoration: none;
+  color: var(--text-dark);
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.config-nav-menu li a:hover {
+  color: var(--primary-color);
+  background: rgba(40, 167, 69, 0.1);
+}
+
+/* Modo oscuro para el menú */
+.dark-mode .config-nav-menu li a {
+  color: #ffffff;
+}
+
+.dark-mode .config-nav-menu li a:hover {
+  color: #1abb01;
+  background: rgba(26, 187, 1, 0.1);
+}
+
+.dark-mode .nav-profile-icon a:hover {
+  background: transparent;
+}
+
+.dark-mode .profile-icon {
+  color: inherit;
+}
+
+.dark-mode .nav-profile-icon a:hover .profile-icon {
+  color: inherit;
+  opacity: 0.8;
+}
+
+.dark-mode .config-logout-btn {
+  background-color: #fc8181;
+  color: #000000;
+}
+
+.dark-mode .config-logout-btn:hover {
+  background-color: #f56565;
+  color: #000000;
+}
+
+/* ================================
+   ESTILOS RESPONSIVE
+   ================================ */
+
+@media (max-width: 768px) {
+  .nav-profile-icon {
+    margin-left: 0;
+  }
+  
+  .nav-profile-icon a {
+    width: 44px;
+    height: 44px;
+    padding: 5px;
+  }
+  
+  .profile-icon {
+    font-size: 40px;
+  }
+  
+  .config-nav-menu {
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .config-logout-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-profile-icon a {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .profile-icon {
+    font-size: 36px;
+  }
+  
+  .config-nav-menu {
+    gap: 0.75rem;
+  }
+  
+  .config-nav-menu li a {
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+  
+  .config-logout-btn {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Ajuste para cuando el menú se vuelve vertical en móviles */
+@media (max-width: 768px) {
+  .config-nav {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .config-nav-menu {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .nav-profile-icon {
+    margin: 0;
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .config {

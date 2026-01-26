@@ -5,11 +5,13 @@ import Users from '../components/users/Users';
 import Especial from '../components/especiales/Especiales';
 import Ordenes from '../components/ordenes/Ordenes';
 import Notificaciones from '../components/notificaciones/Notificaciones';
+import Respaldos  from '../components/Backup/Backup';
 
 import { FaBars, FaTimes, FaCog, FaUsers } from 'react-icons/fa';
 import { FaBowlFood } from 'react-icons/fa6';
 import { HiClipboardList } from "react-icons/hi";
 import { MdNotificationsActive } from "react-icons/md";
+import { BsDatabaseFillGear } from "react-icons/bs";
 
 import { ConfigProvider, useConfig } from '../context/config';
 import '../css/home-admin.css';
@@ -61,12 +63,16 @@ const Main = () => {
         setActiveContent(<Especial />);
         break;
 
-      case 'ordenes':
+      case 'Ordenes':
         setActiveContent(<Ordenes />);
         break;
 
-      case 'notificaciones':
+      case 'Notificaciones':
         setActiveContent(<Notificaciones />);
+        break;
+
+      case 'Respaldos':
+        setActiveContent(<Respaldos />);
         break;
 
       default:
@@ -129,19 +135,27 @@ const Main = () => {
           </button>
 
           <button 
-            className={`nav-btn ${activeContentType === 'ordenes' ? 'active' : ''}`}
-            onClick={() => loadContent('ordenes')}
+            className={`nav-btn ${activeContentType === 'Ordenes' ? 'active' : ''}`}
+            onClick={() => loadContent('Ordenes')}
           >
             <HiClipboardList className="nav-icon" />
-            {t('orders')}
+            {t('Orders')}
           </button>
 
           <button 
-            className={`nav-btn ${activeContentType === 'notificaciones' ? 'active' : ''}`}
-            onClick={() => loadContent('notificaciones')}
+            className={`nav-btn ${activeContentType === 'Notificaciones' ? 'active' : ''}`}
+            onClick={() => loadContent('Notificaciones')}
           >
             <MdNotificationsActive className="nav-icon" />
-            {t('notifications')}
+            {t('Notifications')}
+          </button>
+
+          <button 
+            className={`nav-btn ${activeContentType === 'Respaldos' ? 'active' : ''}`}
+            onClick={() => loadContent('Respaldos')}
+          >
+            <BsDatabaseFillGear className="nav-icon" />
+            {t('Respaldos')}
           </button>
 
           <button 

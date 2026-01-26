@@ -1,5 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useConfig } from '../context/config';
+import { HiMiniUserCircle } from "react-icons/hi2";
+import { IoNotificationsCircle } from "react-icons/io5";
 import '../css/home.css';
 
 import logo from '../img/crazylettuces.png';
@@ -11,6 +14,19 @@ import tik_tokLogo from '../img/tik-tok.png';
 
 const Home = () => {
   const { t } = useConfig();
+  const navigate = useNavigate();
+  
+  // Verificar si el usuario está autenticado
+  const isAuthenticated = localStorage.getItem('token') !== null;
+
+  // Función para cerrar sesión
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userData');
+    navigate('/'); // Redirigir a Home, no a Login
+    window.location.reload(); // Recargar para actualizar el estado
+  };
 
   return (
     <div className="home">
@@ -31,6 +47,27 @@ const Home = () => {
             <li><a href="/nosotros">{t('nosotros')}</a></li>
             <li><a href="/configuracion">{t('configuracion')}</a></li>
             <li><a href="/login">{t('login')}</a></li>
+            <li className="nav-profile-icon">
+              <a href="/perfil" title="Mi Perfil">
+                <HiMiniUserCircle className="profile-icon" />
+              </a>
+            </li>
+            <li className="nav-profile-icon">
+              <a href="/notificacionesUser" title="Notifycation">
+                <IoNotificationsCircle className="profile-icon" />
+              </a>
+            </li>
+            {isAuthenticated && (
+              <li>
+                <button 
+                  onClick={handleLogout} 
+                  className="home-logout-btn"
+                  title="Cerrar Sesión"
+                >
+                  Cerrar Sesión
+                </button>
+              </li>
+            )}
           </ul>
         </nav>
       </header>

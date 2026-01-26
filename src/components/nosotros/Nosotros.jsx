@@ -1,5 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useConfig } from '../../context/config';
+import { HiMiniUserCircle } from "react-icons/hi2";
+import { IoNotificationsCircle } from "react-icons/io5";
 import '../../css/nosotros.css';
 
 import logo from '../../img/crazylettuces.png';
@@ -8,6 +11,19 @@ import logolechuga from '../../img/lechugalogo.png';
 
 const Nosotros = () => {
   const { t } = useConfig();
+  const navigate = useNavigate();
+  
+  // Verificar si el usuario está autenticado
+  const isAuthenticated = localStorage.getItem('token') !== null;
+
+  // Función para cerrar sesión
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userData');
+    navigate('/'); // Redirigir a Home
+    window.location.reload(); // Recargar para actualizar el estado
+  };
 
   return (
     <div className="nosotros">
@@ -28,6 +44,27 @@ const Nosotros = () => {
             <li><a href="#nosotros">{t('nosotros')}</a></li>
             <li><a href="/configuracion">{t('configuracion')}</a></li>
             <li><a href="/login">{t('login')}</a></li>
+            <li className="nav-profile-icon">
+              <a href="/perfil" title="Mi Perfil">
+                <HiMiniUserCircle className="profile-icon" />
+              </a>
+            </li>
+            <li className="nav-profile-icon">
+              <a href="/notificacionesUser" title="Notifycation">
+                <IoNotificationsCircle className="profile-icon" />
+              </a>
+            </li>
+            {isAuthenticated && (
+              <li>
+                <button 
+                  onClick={handleLogout} 
+                  className="nosotros-logout-btn"
+                  title="Cerrar Sesión"
+                >
+                  Cerrar Sesión
+                </button>
+              </li>
+            )}
           </ul>
         </nav>
       </header>
@@ -153,7 +190,7 @@ const Nosotros = () => {
             <div className="nosotros-historia-text">
               <h2>{t('nuestraHistoria')}</h2>
               <p>
-                <span className="nosotros-crazy-swash-text">Crazy</span> Lettuces {t('historiaTexto1')}
+                <span className="nosotros-crazy-swash-text"></span>{t('historiaTexto1')}
               </p>
               <p>
                 {t('historiaTexto2')}

@@ -21,11 +21,11 @@ const Notificaciones = () => {
   const [showSendModal, setShowSendModal] = useState(false);
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [selectedNotification, setSelectedNotification] = useState(null);
   const [notificationToDelete, setNotificationToDelete] = useState(null);
   const [usuarios, setUsuarios] = useState([]);
   const [analyticsData, setAnalyticsData] = useState(null);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [userRole, setUserRole] = useState(null);
   const [messageForm, setMessageForm] = useState({
     destinatario_tipo: 'todos',
     destinatario_id: '',
@@ -36,29 +36,89 @@ const Notificaciones = () => {
   const notificacionesPerPage = 10;
   const API_BASE_URL = 'http://127.0.0.1:5000';
 
+  // Efecto para cargar datos iniciales
   useEffect(() => {
-    fetchNotificaciones();
+    const loadInitialData = async () => {
+      try {
+        console.log('🔵 INICIANDO CARGA DE NOTIFICACIONES');
+        
+        // 1. Obtener rol del usuario
+        const token = localStorage.getItem('token');
+        const userData = JSON.parse(localStorage.getItem('user'));
+        
+        if (userData) {
+          setUserRole(userData.rol || userData.role);
+          console.log('📋 Rol obtenido de localStorage:', userData.rol || userData.role);
+          console.log('👤 ID Usuario:', userData.id);
+        } else if (token) {
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const role = payload.rol || payload.role;
+            setUserRole(role);
+            console.log('📋 Rol obtenido del token:', role);
+          } catch (error) {
+            console.error('❌ Error al decodificar token:', error);
+          }
+        }
+        
+        // 2. Cargar notificaciones inmediatamente
+        await fetchNotificaciones();
+        
+      } catch (error) {
+        console.error('Error en carga inicial:', error);
+        setError('Error al cargar las notificaciones');
+      }
+    };
+
+    loadInitialData();
   }, []);
 
+  // Efecto para cargar usuarios cuando se abre el modal de enviar mensaje
   useEffect(() => {
-    if (showSendModal) {
+    if (showSendModal && userRole === 1) {
       fetchUsuarios();
     }
-  }, [showSendModal]);
+  }, [showSendModal, userRole]);
 
+  // Efecto para cargar analytics cuando se abre el modal de estadísticas
   useEffect(() => {
-    if (showAnalyticsModal) {
+    if (showAnalyticsModal && userRole === 1) {
       fetchAnalytics();
     }
-  }, [showAnalyticsModal]);
+  }, [showAnalyticsModal, userRole]);
 
+  // Función para determinar el tipo de usuario
+  const getUserType = () => {
+    return userRole === 1 ? 'admin' : 'cliente';
+  };
+
+  // Función principal para obtener notificaciones
   const fetchNotificaciones = async () => {
     try {
+      console.log('\n🔄 ===== INICIANDO CARGA DE NOTIFICACIONES =====');
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('token');
       
-      const response = await fetch(`${API_BASE_URL}/notificaciones/usuario`, {
+      const token = localStorage.getItem('token');
+      const userData = JSON.parse(localStorage.getItem('user'));
+      
+      console.log('📋 Datos del usuario localStorage:', userData);
+      console.log('🔑 Token presente:', token ? `Sí (${token.length} caracteres)` : 'No');
+      
+      if (!token) {
+        setError('No hay sesión activa');
+        setLoading(false);
+        return;
+      }
+      
+      // Obtener user_type
+      const userType = userData?.rol === 1 ? 'admin' : 'cliente';
+      console.log(`🎭 User Type calculado: ${userType}`);
+      
+      const url = `${API_BASE_URL}/notificaciones/usuario?user_type=${userType}`;
+      console.log(`🌐 URL de petición: ${url}`);
+      
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -66,27 +126,42 @@ const Notificaciones = () => {
         }
       });
       
-      console.log('Respuesta de notificaciones:', response.status);
+      console.log(`📡 Status response: ${response.status} ${response.statusText}`);
       
       if (response.ok) {
         const data = await response.json();
+        console.log(`📊 Datos recibidos: ${data.notificaciones?.length || 0} notificaciones`);
+        
+        // Mostrar detalles de las primeras notificaciones
+        if (data.notificaciones && data.notificaciones.length > 0) {
+          console.log('📋 Primeras notificaciones recibidas:');
+          data.notificaciones.slice(0, 3).forEach((notif, i) => {
+            console.log(`   ${i+1}. ID: ${notif.id}, User ID: ${notif.user_id}, Tipo: ${notif.tipo}, Leída: ${notif.leida}`);
+          });
+        }
+        
         setNotificaciones(data.notificaciones || []);
         setFilteredNotificaciones(data.notificaciones || []);
+        
       } else if (response.status === 403) {
-        setError('No tienes permisos para acceder a las notificaciones. Esta sección es solo para administradores.');
+        setError('No tienes permisos para acceder a las notificaciones.');
       } else if (response.status === 401) {
         setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
       } else {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
         setError(`Error ${response.status} al obtener notificaciones`);
       }
     } catch (error) {
       console.error('Error de conexión:', error);
-      setError('Error de conexión con el servidor');
+      setError(`Error de conexión: ${error.message}`);
     } finally {
+      console.log('✅ Finalizando fetchNotificaciones');
       setLoading(false);
     }
   };
 
+  // Función para obtener usuarios (solo admin)
   const fetchUsuarios = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -110,6 +185,7 @@ const Notificaciones = () => {
     }
   };
 
+  // Función para obtener estadísticas (solo admin)
   const fetchAnalytics = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -133,10 +209,93 @@ const Notificaciones = () => {
     }
   };
 
-  const handleRefresh = () => {
-    fetchNotificaciones();
+  // Función para refrescar notificaciones
+  const handleRefresh = async () => {
+    console.log('🔄 Refrescando notificaciones...');
+    await fetchNotificaciones();
   };
 
+  // FUNCIÓN CORREGIDA: Marcar notificación individual como leída
+  const handleMarkAsRead = async (notifId) => {
+    try {
+      console.log(`\n=== MARCANDO NOTIFICACIÓN ${notifId} COMO LEÍDA ===`);
+      
+      const token = localStorage.getItem('token');
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const currentUserId = userData?.id || userData?.user_id;
+      
+      console.log('👤 ID Usuario actual:', currentUserId);
+      
+      // 1. Encontrar la notificación en el array local
+      const notificacion = notificaciones.find(n => n.id === notifId);
+      if (!notificacion) {
+        console.log(`❌ Notificación ${notifId} no encontrada en el array local`);
+        return;
+      }
+      
+      console.log('📋 Datos de la notificación:');
+      console.log('   - User ID en notificación:', notificacion.user_id);
+      console.log('   - User Type:', notificacion.user_type);
+      console.log('   - Título:', notificacion.titulo);
+      console.log('   - Ya leída?', notificacion.leida);
+      
+      // Verificar si los IDs coinciden
+      console.log(`🔍 Comparación de IDs: ${notificacion.user_id} vs ${currentUserId}`);
+      console.log(`   - ¿Coinciden? ${notificacion.user_id == currentUserId}`);
+      
+      // 2. PRIMERO: Actualizar SOLO ESA NOTIFICACIÓN en frontend
+      console.log('🔄 Actualizando SOLO esta notificación en frontend...');
+      const updatedNotificaciones = notificaciones.map(notif => 
+        notif.id === notifId ? { ...notif, leida: true } : notif
+      );
+      setNotificaciones(updatedNotificaciones);
+      setFilteredNotificaciones(updatedNotificaciones);
+      
+      console.log(`✅ Actualizado en frontend: Notificación ${notifId} marcada como leída`);
+      
+      // 3. SEGUNDO: Intentar sincronizar con backend (OPCIONAL)
+      try {
+        console.log(`🔄 Intentando sincronizar con backend (opcional)...`);
+        
+        const response = await fetch(`${API_BASE_URL}/notificaciones/${notifId}/leer`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          console.log(`✅ Sincronizado con backend: Notificación ${notifId} marcada como leída`);
+        } else if (response.status === 403) {
+          console.warn(`⚠️ Error 403: No tienes permiso para esta notificación en backend`);
+          console.warn('   Esto pasa cuando el user_id de la notificación no coincide con tu user_id');
+          console.warn('   Pero la notificación SE MANTIENE MARCADA en el frontend');
+          
+          // ¡IMPORTANTE! NO llamar a ningún otro endpoint aquí
+          // Solo deja que la notificación esté marcada en frontend
+        } else {
+          console.warn(`⚠️ Error ${response.status} del backend, pero se mantiene en frontend`);
+        }
+      } catch (backendError) {
+        console.warn('⚠️ Error de conexión con backend, pero se mantiene en frontend');
+      }
+      
+      console.log(`=== FIN MARCADO DE NOTIFICACIÓN ${notifId} ===\n`);
+      
+    } catch (error) {
+      console.error('❌ Error inesperado:', error);
+      
+      // En caso de error, al menos actualizar en frontend
+      const updatedNotificaciones = notificaciones.map(notif => 
+        notif.id === notifId ? { ...notif, leida: true } : notif
+      );
+      setNotificaciones(updatedNotificaciones);
+      setFilteredNotificaciones(updatedNotificaciones);
+    }
+  };
+
+  // Efecto para filtrar notificaciones
   useEffect(() => {
     let filtered = notificaciones;
 
@@ -162,6 +321,7 @@ const Notificaciones = () => {
     setCurrentPage(1);
   }, [searchTerm, typeFilter, readFilter, notificaciones]);
 
+  // Cálculos para paginación
   const indexOfLastNotif = currentPage * notificacionesPerPage;
   const indexOfFirstNotif = indexOfLastNotif - notificacionesPerPage;
   const currentNotificaciones = filteredNotificaciones.slice(indexOfFirstNotif, indexOfLastNotif);
@@ -169,11 +329,13 @@ const Notificaciones = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Función para manejar clic en eliminar
   const handleDeleteClick = (notifId, notifTitulo) => {
     setNotificationToDelete({ id: notifId, titulo: notifTitulo });
     setShowDeleteConfirm(true);
   };
 
+  // Función para confirmar eliminación
   const handleDeleteConfirm = async () => {
     if (!notificationToDelete) return;
 
@@ -209,40 +371,34 @@ const Notificaciones = () => {
     }
   };
 
+  // Función para cancelar eliminación
   const handleDeleteCancel = () => {
     setShowDeleteConfirm(false);
     setNotificationToDelete(null);
   };
 
-  const handleMarkAsRead = async (notifId) => {
-    try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`${API_BASE_URL}/notificaciones/${notifId}/leer`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const updatedNotificaciones = notificaciones.map(notif => 
-          notif.id === notifId ? { ...notif, leida: true } : notif
-        );
-        setNotificaciones(updatedNotificaciones);
-        setFilteredNotificaciones(updatedNotificaciones);
-      }
-    } catch (error) {
-      console.error('Error al marcar como leída:', error);
-    }
-  };
-
+  // Función para marcar TODAS como leídas (SOLO cuando se hace clic en ese botón)
   const handleMarkAllAsRead = async () => {
     try {
-      const token = localStorage.getItem('token');
+      console.log('🔄 MARCANDO TODAS LAS NOTIFICACIONES COMO LEÍDAS...');
       
-      const response = await fetch(`${API_BASE_URL}/notificaciones/leer-todas`, {
+      const token = localStorage.getItem('token');
+      const userType = getUserType();
+      
+      console.log(`👤 User Type para marcar todas: ${userType}`);
+      
+      // Primero actualizar todas en frontend
+      const updatedNotificaciones = notificaciones.map(notif => ({
+        ...notif,
+        leida: true
+      }));
+      setNotificaciones(updatedNotificaciones);
+      setFilteredNotificaciones(updatedNotificaciones);
+      
+      console.log('✅ Actualizadas todas en frontend');
+      
+      // Luego sincronizar con backend
+      const response = await fetch(`${API_BASE_URL}/notificaciones/leer-todas?user_type=${userType}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -251,18 +407,16 @@ const Notificaciones = () => {
       });
 
       if (response.ok) {
-        const updatedNotificaciones = notificaciones.map(notif => ({
-          ...notif,
-          leida: true
-        }));
-        setNotificaciones(updatedNotificaciones);
-        setFilteredNotificaciones(updatedNotificaciones);
+        console.log('✅ Todas las notificaciones sincronizadas con backend');
+      } else {
+        console.warn('⚠️ No se pudo sincronizar todas con el backend');
       }
     } catch (error) {
       console.error('Error al marcar todas como leídas:', error);
     }
   };
 
+  // Función para eliminar todas las leídas
   const handleDeleteAllRead = async () => {
     if (!window.confirm('¿Estás seguro de que quieres eliminar todas las notificaciones leídas?')) {
       return;
@@ -271,7 +425,9 @@ const Notificaciones = () => {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`${API_BASE_URL}/notificaciones/leidas`, {
+      const userType = getUserType();
+      
+      const response = await fetch(`${API_BASE_URL}/notificaciones/leidas?user_type=${userType}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -289,6 +445,7 @@ const Notificaciones = () => {
     }
   };
 
+  // Función para enviar mensaje
   const handleSendMessage = async (e) => {
     e.preventDefault();
     
@@ -335,6 +492,7 @@ const Notificaciones = () => {
     }
   };
 
+  // Función para formatear fecha
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('es-MX', {
@@ -346,23 +504,7 @@ const Notificaciones = () => {
     });
   };
 
-  const getNotificationIcon = (tipo) => {
-    switch(tipo) {
-      case 'nuevo_pedido':
-        return '';
-      case 'estado_cambiado':
-        return '';
-      case 'estado_pedido':
-        return '';
-      case 'mensaje_admin':
-        return '';
-      case 'pedido_cancelado':
-        return '';
-      default:
-        return '';
-    }
-  };
-
+  // Función para obtener texto del tipo de notificación
   const getNotificationTypeText = (tipo) => {
     switch(tipo) {
       case 'nuevo_pedido':
@@ -380,6 +522,7 @@ const Notificaciones = () => {
     }
   };
 
+  // Función para obtener color según tipo
   const getNotificationColor = (tipo) => {
     switch(tipo) {
       case 'nuevo_pedido':
@@ -397,15 +540,19 @@ const Notificaciones = () => {
     }
   };
 
+  // Renderizar estado de carga inicial
   if (loading && notificaciones.length === 0) {
     return (
       <div className={`notificaciones-container ${darkMode ? 'dark-mode' : ''}`}>
         <div className="loading-spinner"></div>
-        <p style={{textAlign: 'center', color: darkMode ? '#e2e8f0' : '#666'}}>Cargando notificaciones...</p>
+        <p style={{textAlign: 'center', color: darkMode ? '#e2e8f0' : '#666'}}>
+          Cargando notificaciones...
+        </p>
       </div>
     );
   }
 
+  // Renderizar error
   if (error) {
     return (
       <div className={`notificaciones-container ${darkMode ? 'dark-mode' : ''}`}>
@@ -429,7 +576,7 @@ const Notificaciones = () => {
         
         {/* Header con título y botones */}
         <div className="section-header">
-          <h3>Panel de Notificaciones</h3>
+          <h3>Notificaciones</h3>
           <div className="header-buttons">
             <button 
               className="refresh-btn"
@@ -437,46 +584,57 @@ const Notificaciones = () => {
               title="Actualizar notificaciones"
               disabled={loading}
             >
-              <img src={refreshIcon} alt="Actualizar" className="btn-icon-img-actualizar" />
+              <img 
+                src={refreshIcon} 
+                alt="Actualizar" 
+                className={`btn-icon-img-actualizar ${loading ? 'spinning' : ''}`} 
+              />
+              {loading ? 'Actualizando...' : 'Actualizar'}
             </button>
             
             <button 
               className="mark-read-btn"
               onClick={handleMarkAllAsRead}
               title="Marcar todas como leídas"
-              disabled={notificaciones.every(n => n.leida)}
+              disabled={notificaciones.every(n => n.leida) || loading}
             >
               <img src={readIcon} alt="Marcar leídas" className="btn-icon-img" />
               Marcar Todas Leídas
             </button>
             
-            <button 
-              className="delete-read-btn"
-              onClick={handleDeleteAllRead}
-              title="Eliminar notificaciones leídas"
-              disabled={notificaciones.every(n => !n.leida)}
-            >
-              <img src={deleteIcon} alt="Eliminar leídas" className="btn-icon-img" />
-              Eliminar Leídas
-            </button>
-            
-            <button 
-              className="send-message-btn"
-              onClick={() => setShowSendModal(true)}
-              title="Enviar mensaje a usuarios"
-            >
-              <img src={sendIcon} alt="Enviar" className="btn-icon-img" />
-              Enviar Mensaje
-            </button>
-            
-            <button 
-              className="analytics-btn"
-              onClick={() => setShowAnalyticsModal(true)}
-              title="Ver estadísticas"
-            >
-              <img src={statsIcon} alt="Estadísticas" className="btn-icon-img" />
-              Estadísticas
-            </button>
+            {userRole === 1 && (
+              <>
+                <button 
+                  className="delete-read-btn"
+                  onClick={handleDeleteAllRead}
+                  title="Eliminar notificaciones leídas"
+                  disabled={notificaciones.every(n => !n.leida) || loading}
+                >
+                  <img src={deleteIcon} alt="Eliminar leídas" className="btn-icon-img" />
+                  Eliminar Leídas
+                </button>
+                
+                <button 
+                  className="send-message-btn"
+                  onClick={() => setShowSendModal(true)}
+                  title="Enviar mensaje a usuarios"
+                  disabled={loading}
+                >
+                  <img src={sendIcon} alt="Enviar" className="btn-icon-img" />
+                  Enviar Mensaje
+                </button>
+                
+                <button 
+                  className="analytics-btn"
+                  onClick={() => setShowAnalyticsModal(true)}
+                  title="Ver estadísticas"
+                  disabled={loading}
+                >
+                  <img src={statsIcon} alt="Estadísticas" className="btn-icon-img" />
+                  Estadísticas
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -490,6 +648,7 @@ const Notificaciones = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
+                disabled={loading}
               />
               {searchTerm && (
                 <button 
@@ -507,6 +666,7 @@ const Notificaciones = () => {
                 value={typeFilter} 
                 onChange={(e) => setTypeFilter(e.target.value)}
                 className="filter-select"
+                disabled={loading}
               >
                 <option value="">Todos los tipos</option>
                 <option value="nuevo_pedido">Nuevos Pedidos</option>
@@ -522,6 +682,7 @@ const Notificaciones = () => {
                 value={readFilter} 
                 onChange={(e) => setReadFilter(e.target.value)}
                 className="filter-select"
+                disabled={loading}
               >
                 <option value="">Todas</option>
                 <option value="no-leidas">No leídas</option>
@@ -539,10 +700,20 @@ const Notificaciones = () => {
           <span className="counter-unread">
             No leídas: <strong>{notificaciones.filter(n => !n.leida).length}</strong>
           </span>
+          <span className="counter-role">
+            Rol: <strong>{userRole === 1 ? 'Administrador' : 'Cliente'}</strong>
+          </span>
         </div>
 
         {/* Lista de notificaciones */}
         <div className="notificaciones-list-container">
+          {loading && notificaciones.length > 0 && (
+            <div className="list-loading-overlay">
+              <div className="loading-spinner small"></div>
+              <span>Actualizando notificaciones...</span>
+            </div>
+          )}
+          
           {currentNotificaciones.length > 0 ? (
             currentNotificaciones.map(notif => (
               <div 
@@ -552,7 +723,7 @@ const Notificaciones = () => {
               >
                 <div className="notificacion-header">
                   <div className="notificacion-icon">
-                    {getNotificationIcon(notif.tipo)}
+                    <div className="notification-type-indicator" style={{ backgroundColor: getNotificationColor(notif.tipo) }}></div>
                   </div>
                   <div className="notificacion-info">
                     <h4 className="notificacion-titulo">{notif.titulo}</h4>
@@ -573,19 +744,62 @@ const Notificaciones = () => {
                   <div className="notificacion-actions">
                     {!notif.leida && (
                       <button 
-                        onClick={() => handleMarkAsRead(notif.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log(`🎯 Click en marcar como leída - ID: ${notif.id}`);
+                          handleMarkAsRead(notif.id);
+                        }}
                         className="action-btn mark-read-btn"
                         title="Marcar como leída"
+                        disabled={loading}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          backgroundColor: '#28a745',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '16px',
+                          fontWeight: 'bold'
+                        }}
                       >
                         ✓
                       </button>
                     )}
                     <button 
-                      onClick={() => handleDeleteClick(notif.id, notif.titulo)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(notif.id, notif.titulo);
+                      }}
                       className="action-btn delete-btn"
                       title="Eliminar notificación"
+                      disabled={loading}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        backgroundColor: '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
                     >
-                      <img src={deleteIcon} alt="Eliminar" className="action-icon" />
+                      <img 
+                        src={deleteIcon} 
+                        alt="Eliminar" 
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          filter: 'invert(1)'
+                        }} 
+                      />
                     </button>
                   </div>
                 </div>
@@ -632,10 +846,17 @@ const Notificaciones = () => {
             ))
           ) : (
             <div className="no-notificaciones">
-              {searchTerm || typeFilter || readFilter 
-                ? 'No se encontraron notificaciones con esos criterios' 
-                : 'No hay notificaciones disponibles'
+              {loading ? 'Cargando notificaciones...' : 
+               searchTerm || typeFilter || readFilter ? 
+                 'No se encontraron notificaciones con esos criterios' : 
+                 'No hay notificaciones disponibles'
               }
+              {!loading && notificaciones.length === 0 && (
+                <p style={{ fontSize: '14px', color: darkMode ? '#94a3b8' : '#64748b', marginTop: '10px' }}>
+                  Las notificaciones aparecerán aquí cuando recibas nuevos pedidos, 
+                  haya cambios en tus pedidos o recibas mensajes del restaurante.
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -646,7 +867,7 @@ const Notificaciones = () => {
             <div className="pagination-controls">
               <button 
                 onClick={() => paginate(currentPage - 1)} 
-                disabled={currentPage === 1}
+                disabled={currentPage === 1 || loading}
                 className="pagination-btn prev-btn"
               >
                 Anterior
@@ -667,6 +888,7 @@ const Notificaciones = () => {
                         <button
                           onClick={() => paginate(number)}
                           className={`pagination-btn ${currentPage === number ? 'active' : ''}`}
+                          disabled={loading}
                         >
                           {number}
                         </button>
@@ -677,7 +899,7 @@ const Notificaciones = () => {
               
               <button 
                 onClick={() => paginate(currentPage + 1)} 
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalPages || loading}
                 className="pagination-btn next-btn"
               >
                 Siguiente
@@ -704,7 +926,6 @@ const Notificaciones = () => {
                 <h3>¿Eliminar Notificación?</h3>
               </div>
               <div className="confirm-body">
-                <div className="confirm-icon"></div>
                 <p className="confirm-message">
                   ¿Estás seguro de que quieres eliminar la notificación:
                   <strong> "{notificationToDelete?.titulo}"</strong>?
@@ -762,12 +983,16 @@ const Notificaciones = () => {
                     >
                       <option value="todos">Todos los Usuarios</option>
                       <option value="cliente">Cliente Específico</option>
+                      <option value="admin">Administrador Específico</option>
+                      <option value="todos_admins">Todos los Administradores</option>
                     </select>
                   </div>
 
-                  {messageForm.destinatario_tipo === 'cliente' && (
+                  {(messageForm.destinatario_tipo === 'cliente' || messageForm.destinatario_tipo === 'admin') && (
                     <div className="form-group">
-                      <label htmlFor="destinatario_id">Seleccionar Cliente</label>
+                      <label htmlFor="destinatario_id">
+                        {messageForm.destinatario_tipo === 'cliente' ? 'Seleccionar Cliente' : 'Seleccionar Administrador'}
+                      </label>
                       <select
                         id="destinatario_id"
                         value={messageForm.destinatario_id}
@@ -776,12 +1001,14 @@ const Notificaciones = () => {
                           destinatario_id: e.target.value
                         })}
                         className="form-select"
-                        required={messageForm.destinatario_tipo === 'cliente'}
+                        required={messageForm.destinatario_tipo === 'cliente' || messageForm.destinatario_tipo === 'admin'}
                         disabled={sendingMessage}
                       >
-                        <option value="">Seleccionar cliente...</option>
+                        <option value="">Seleccionar...</option>
                         {usuarios
-                          .filter(user => user.role === 2)
+                          .filter(user => 
+                            messageForm.destinatario_tipo === 'cliente' ? user.role === 2 : user.role === 1
+                          )
                           .map(user => (
                             <option key={user.id} value={user.id}>
                               {user.nombre} ({user.email || user.telefono})
@@ -876,7 +1103,7 @@ const Notificaciones = () => {
                             <span className="stat-label">No Leídas</span>
                           </div>
                           <div className="stat-item">
-                            <span className="stat-value">{analyticsData.tasa_lectura.toFixed(1)}%</span>
+                            <span className="stat-value">{analyticsData.tasa_lectura?.toFixed(1) || '0'}%</span>
                             <span className="stat-label">Tasa de Lectura</span>
                           </div>
                         </div>
@@ -898,7 +1125,7 @@ const Notificaciones = () => {
 
                       {analyticsData.estadisticas_diarias && (
                         <div className="analytics-card">
-                          <h4>Actividad por Día (Últimos 7 días)</h4>
+                          <h4>Actividad por Día</h4>
                           <div className="analytics-list">
                             {analyticsData.estadisticas_diarias.map((estadistica, index) => (
                               <div key={index} className="analytics-item">
@@ -909,14 +1136,6 @@ const Notificaciones = () => {
                           </div>
                         </div>
                       )}
-
-                      <div className="analytics-card">
-                        <h4>Información del Análisis</h4>
-                        <div className="analytics-info">
-                          <p>Período analizado: {analyticsData.periodo_analizado}</p>
-                          <p>Última actualización: {new Date().toLocaleDateString('es-MX')}</p>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 ) : (

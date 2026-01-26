@@ -522,6 +522,8 @@
     color: #2E7D32 !important;
 }
 
+
+
 /* Media Queries para tablets y escritorio */
 @media (min-width: 768px) {
     .register-container {

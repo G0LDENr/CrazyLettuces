@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash, faGlobe, faSun, faMoon, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faGlobe, faSun, faMoon, faArrowLeft, faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { IoNotificationsCircle } from "react-icons/io5";
 import Logo from "../../img/crazylettuces.png";
 import '../../css/login.css';
 
@@ -14,6 +15,18 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [language, setLanguage] = useState('es');
     const [darkMode, setDarkMode] = useState(false);
+
+    // Verificar si el usuario está autenticado
+    const isAuthenticated = localStorage.getItem('token') !== null;
+
+    // Función para cerrar sesión
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('userData');
+        navigate('/'); // Redirigir a Home
+        window.location.reload(); // Recargar para actualizar el estado
+    };
 
     // Efecto para aplicar el modo oscuro al body de manera consistente
     useEffect(() => {
@@ -67,7 +80,9 @@ const Login = () => {
             close: "Cerrar",
             darkMode: "Modo oscuro",
             lightMode: "Modo claro",
-            back: "Regresar"
+            back: "Regresar",
+            logout: "Cerrar Sesión",
+            myProfile: "Mi Perfil"
         },
         en: {
             title: "Login",
@@ -88,60 +103,75 @@ const Login = () => {
             close: "Close",
             darkMode: "Dark mode",
             lightMode: "Light mode",
-            back: "Back"
+            back: "Back",
+            logout: "Logout",
+            myProfile: "My Profile"
         }
     };
 
     const t = texts[language];
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
-        if (!email || !password) {
-            setError(t.errorComplete);
-            setLoading(false);
-            return;
-        }
+    if (!email || !password) {
+        setError(t.errorComplete);
+        setLoading(false);
+        return;
+    }
 
-        try {
-            const response = await fetch('http://127.0.0.1:5000/user/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ email, password }),
-            });
+    try {
+        const response = await fetch('http://127.0.0.1:5000/user/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ email, password }),
+        });
 
-            // Agregar debug para ver la respuesta
-            console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('🔍 RESPONSE DATA:', data); // VER ESTO
+        console.log('🔍 USER DATA:', data.user); // VER ESTO
+        console.log('🔍 USER HAS NOMBRE?', data.user?.nombre); // VER ESTO
+        console.log('🔍 USER HAS TELEFONO?', data.user?.telefono); // VER ESTO
+
+        if (response.ok) {
+            localStorage.setItem('token', data.access_token);
             
-            const data = await response.json();
-            console.log('Response data:', data); // Debug para ver la estructura completa
-
-            if (response.ok) {
-                localStorage.setItem('token', data.access_token);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                
-                // CORRECCIÓN: Verificar data.user.rol en lugar de data.user.role
-                if (data.user && data.user.rol !== undefined) {
-                    redirectByRole(data.user.rol);
-                } else {
-                    console.log('User data structure:', data.user); // Debug
-                    setError(t.errorUserData);
-                }
+            // Debug: Ver qué se está guardando
+            console.log('💾 Guardando en localStorage:');
+            console.log('Token:', data.access_token);
+            console.log('User completo:', data.user);
+            
+            // Guardar en localStorage
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('userData', JSON.stringify(data.user));
+            
+            // Verificar que se guardó correctamente
+            console.log('✅ Verificando localStorage:');
+            console.log('Token guardado:', localStorage.getItem('token'));
+            console.log('User guardado:', localStorage.getItem('user'));
+            console.log('UserData guardado:', localStorage.getItem('userData'));
+            
+            // Redirigir según rol
+            if (data.user && data.user.rol !== undefined) {
+                redirectByRole(data.user.rol);
             } else {
-                setError(data.msg || t.errorCredentials);
+                navigate('/home');
             }
-        } catch (err) {
-            console.error('Error en login:', err);
-            setError(t.errorConnection);
-        } finally {
-            setLoading(false);
+        } else {
+            setError(data.msg || t.errorCredentials);
         }
-    };
+    } catch (err) {
+        console.error('Error en login:', err);
+        setError(t.errorConnection);
+    } finally {
+        setLoading(false);
+    }
+};
 
     const redirectByRole = (role) => {
         console.log('Redirecting by role:', role); // Debug
@@ -179,19 +209,7 @@ const Login = () => {
 
     return (
         <div className={`login-wrapper ${darkMode ? 'dark-mode' : ''}`}>
-            {/* Botón de modo oscuro/claro - IZQUIERDA */}
-            <div className="theme-switcher">
-                <button 
-                    type="button" 
-                    className="theme-button"
-                    onClick={toggleDarkMode}
-                    title={darkMode ? t.lightMode : t.darkMode}
-                >
-                    <FontAwesomeIcon icon={darkMode ? faSun : faMoon} />
-                </button>
-            </div>
-
-            {/* Botones de la derecha: Regresar e Idioma */}
+            {/* Botones de la derecha: Icono de perfil y Cerrar sesión */}
             <div className="right-buttons-container">
                 {/* Botón de regresar - DERECHA */}
                 <div className="back-button-container">
@@ -205,6 +223,43 @@ const Login = () => {
                         <span>{t.back}</span>
                     </button>
                 </div>
+
+                {/* Icono de perfil SIEMPRE visible - DERECHA */}
+                <div className="profile-icon-container">
+                    <button 
+                        type="button" 
+                        className="profile-icon-button"
+                        onClick={() => navigate('/perfil')}
+                        title={t.myProfile}
+                    >
+                        <FontAwesomeIcon icon={faUserCircle} size="2x" />
+                    </button>
+                </div>
+
+                <div className="profile-icon-container">
+                    <button 
+                        type="button" 
+                        className="profile-icon-button"
+                        onClick={() => navigate('/notificacionesUser')}
+                        title={t.myProfile}
+                    >
+                        <IoNotificationsCircle className="profile-icon" />
+                    </button>
+                </div>
+
+                {/* Botón de cerrar sesión - Solo visible si está autenticado - DERECHA */}
+                {isAuthenticated && (
+                    <div className="logout-button-container">
+                        <button 
+                            type="button" 
+                            className="logout-button"
+                            onClick={handleLogout}
+                            title={t.logout}
+                        >
+                            <span>{t.logout}</span>
+                        </button>
+                    </div>
+                )}
 
                 {/* Botón de cambio de idioma - DERECHA */}
                 <div className="language-switcher">
@@ -220,6 +275,18 @@ const Login = () => {
                         </span>
                     </button>
                 </div>
+            </div>
+
+            {/* Botón de modo oscuro/claro - IZQUIERDA */}
+            <div className="theme-switcher">
+                <button 
+                    type="button" 
+                    className="theme-button"
+                    onClick={toggleDarkMode}
+                    title={darkMode ? t.lightMode : t.darkMode}
+                >
+                    <FontAwesomeIcon icon={darkMode ? faSun : faMoon} />
+                </button>
             </div>
 
             <div className="login-container">

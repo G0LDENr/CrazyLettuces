@@ -14,6 +14,8 @@ import Especial from './components/especiales/Especiales';
 import Ordenes from './components/ordenes/Ordenes';
 import VerificarCodigo from './components/ordenes/verificar-codigo';
 import Productos from './components/productos/Productos';
+import Perfil from './components/perfil/Mi-Perfil';
+import NotificacionesUser from './components/notificaciones/NotificacionesUser';
 
 function App() {
     return (
@@ -33,6 +35,8 @@ function App() {
                     <Route path="/ordenes" element={<Ordenes />} />
                     <Route path="/verificar-codigo" element={<VerificarCodigo />} />
                     <Route path="/productos" element={<Productos />} />
+                    <Route path="/perfil" element={<Perfil />} />
+                    <Route path="/notificacionesUser" element={<NotificacionesUser />} />
                 </Routes>
             </Router>
         </ConfigProvider>
