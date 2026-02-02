@@ -1,0 +1,481 @@
+/* Contenedor principal */
+.edit-ingrediente-form {
+  width: 100%;
+}
+
+.edit-ingrediente-form-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Información del ingrediente actual */
+.edit-ingrediente-info-header {
+  background-color: #f8f9fa;
+  padding: 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 2px solid #e9ecef;
+}
+
+.edit-ingrediente-info-header h4 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.edit-ingrediente-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.edit-ingrediente-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.edit-ingrediente-info-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.edit-ingrediente-info-value {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.edit-ingrediente-status-badge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.edit-ingrediente-status-badge.active {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.edit-ingrediente-status-badge.inactive {
+  background-color: #fed7d7;
+  color: #742a2a;
+}
+
+.edit-ingrediente-categoria-badge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background-color: #e9ecef;
+  color: #495057;
+  text-transform: lowercase;
+}
+
+.edit-ingrediente-categoria-badge.sin-categoria {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  font-style: italic;
+  font-weight: normal;
+}
+
+/* Grupo del formulario */
+.edit-ingrediente-form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.25rem;
+}
+
+.edit-ingrediente-form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+  display: block;
+}
+
+/* Inputs con estilos completos */
+.edit-ingrediente-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: all 0.3s ease;
+  background-color: white;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.edit-ingrediente-input:focus {
+  border-color: #96bd44;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(150, 189, 68, 0.2);
+}
+
+.edit-ingrediente-input:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.edit-ingrediente-input::placeholder {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+/* Input con error */
+.edit-ingrediente-input-error {
+  border-color: #dc3545 !important;
+}
+
+.edit-ingrediente-input-error:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2) !important;
+}
+
+.edit-ingrediente-error-message {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  padding-left: 0.25rem;
+}
+
+/* Contenedor de sugerencias de categorías */
+.edit-ingrediente-categorias-container {
+  margin-top: 0.75rem;
+}
+
+.edit-ingrediente-categorias-sugeridas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.edit-ingrediente-categoria-chip {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  font-weight: 500;
+}
+
+.edit-ingrediente-categoria-chip:hover {
+  background-color: #dee2e6;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.edit-ingrediente-categoria-chip.active {
+  background-color: #96bd44;
+  color: white;
+  border-color: #96bd44;
+  box-shadow: 0 2px 8px rgba(150, 189, 68, 0.3);
+}
+
+/* Texto de ayuda */
+.edit-ingrediente-form-text {
+  color: #6c757d;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  padding-left: 0.25rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* Botones de acción */
+.edit-ingrediente-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.edit-ingrediente-btn-cancel {
+  padding: 0.75rem 1.5rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.edit-ingrediente-btn-cancel:hover:not(:disabled) {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+}
+
+.edit-ingrediente-btn-submit {
+  padding: 0.75rem 1.5rem;
+  background-color: #96bd44;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.edit-ingrediente-btn-submit:hover:not(:disabled) {
+  background-color: #3e4e1d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(150, 189, 68, 0.3);
+}
+
+.edit-ingrediente-btn-cancel:disabled,
+.edit-ingrediente-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Spinner para botón */
+.edit-ingrediente-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: edit-ingrediente-spin 0.6s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes edit-ingrediente-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Mensaje de éxito */
+.edit-ingrediente-success-message {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  border: 1px solid #c3e6cb;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: edit-ingrediente-fade-in 0.3s ease-in;
+}
+
+.edit-ingrediente-success-message::before {
+  content: "✓";
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+@keyframes edit-ingrediente-fade-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========== MODO OSCURO ========== */
+.edit-ingrediente-form-dark-mode .edit-ingrediente-info-header {
+  background-color: #1a1a1a;
+  border-color: #333;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-info-header h4 {
+  color: #e2e8f0;
+  border-bottom-color: #333;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-info-label {
+  color: #a0aec0;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-info-value {
+  color: #e2e8f0;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-status-badge.active {
+  background-color: #22543d;
+  color: #c6f6d5;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-status-badge.inactive {
+  background-color: #742a2a;
+  color: #fed7d7;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-categoria-badge {
+  background-color: #2a2a2a;
+  color: #a0aec0;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-categoria-badge.sin-categoria {
+  background-color: #1a1a1a;
+  color: #718096;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-form-group label {
+  color: #e2e8f0;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-input {
+  background-color: #1a1a1a;
+  border-color: #333;
+  color: #e2e8f0;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-input:focus {
+  border-color: #D4AF37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-input::placeholder {
+  color: #718096;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-input:disabled {
+  background-color: #2a2a2a;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-categoria-chip {
+  background-color: #2a2a2a;
+  color: #a0aec0;
+  border-color: #333;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-categoria-chip:hover {
+  background-color: #333;
+  border-color: #444;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-categoria-chip.active {
+  background-color: #D4AF37;
+  color: #000000;
+  border-color: #D4AF37;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-form-text {
+  color: #a0aec0;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-form-actions {
+  border-top-color: #333;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-btn-cancel {
+  background-color: #6c757d;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-btn-cancel:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-btn-submit {
+  background-color: #D4AF37;
+  color: #000000;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-btn-submit:hover:not(:disabled) {
+  background-color: #b8941f;
+}
+
+.edit-ingrediente-form-dark-mode .edit-ingrediente-success-message {
+  background-color: #1e3a2c;
+  color: #4ade80;
+  border-color: #2d5a3d;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .edit-ingrediente-form-form {
+    gap: 1.25rem;
+  }
+
+  .edit-ingrediente-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .edit-ingrediente-info-header {
+    padding: 1rem;
+  }
+
+  .edit-ingrediente-form-group {
+    margin-bottom: 1rem;
+  }
+
+  .edit-ingrediente-categorias-sugeridas {
+    gap: 0.4rem;
+  }
+
+  .edit-ingrediente-categoria-chip {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.65rem;
+  }
+
+  .edit-ingrediente-form-actions {
+    flex-direction: column;
+    margin-top: 1.5rem;
+    gap: 0.75rem;
+  }
+
+  .edit-ingrediente-btn-cancel,
+  .edit-ingrediente-btn-submit {
+    width: 100%;
+    min-width: auto;
+    padding: 0.85rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-ingrediente-form-form {
+    gap: 1rem;
+  }
+  
+  .edit-ingrediente-info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .edit-ingrediente-input {
+    padding: 0.65rem 0.9rem;
+    font-size: 0.95rem;
+  }
+  
+  .edit-ingrediente-categorias-sugeridas {
+    gap: 0.3rem;
+  }
+  
+  .edit-ingrediente-categoria-chip {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .edit-ingrediente-form-text {
+    font-size: 0.75rem;
+  }
+}

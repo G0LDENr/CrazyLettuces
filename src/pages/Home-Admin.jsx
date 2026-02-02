@@ -6,12 +6,14 @@ import Especial from '../components/especiales/Especiales';
 import Ordenes from '../components/ordenes/Ordenes';
 import Notificaciones from '../components/notificaciones/Notificaciones';
 import Respaldos  from '../components/Backup/Backup';
+import Ingredientes from '../components/Ingredientes/Ingredientes';
 
 import { FaBars, FaTimes, FaCog, FaUsers } from 'react-icons/fa';
 import { FaBowlFood } from 'react-icons/fa6';
 import { HiClipboardList } from "react-icons/hi";
 import { MdNotificationsActive } from "react-icons/md";
 import { BsDatabaseFillGear } from "react-icons/bs";
+import { MdFoodBank } from "react-icons/md";
 
 import { ConfigProvider, useConfig } from '../context/config';
 import '../css/home-admin.css';
@@ -57,6 +59,10 @@ const Main = () => {
         
       case 'configuracion':
         setActiveContent(<Configuracion />);
+        break;
+
+      case 'ingredientes':
+        setActiveContent(<Ingredientes />);
         break;
 
       case 'especiales':
@@ -124,6 +130,14 @@ const Main = () => {
           >
             <FaUsers className="nav-icon" />
             {t('users')} {/* Cambié 'Users' por 'users' para que coincida con las traducciones */}
+          </button>
+
+          <button
+            className={`nav-btn ${activeContentType === 'ingredientes' ? 'active' : ''}`}
+            onClick={() => loadContent('ingredientes')}
+          >
+            <MdFoodBank className="nav-icon" />
+            {t('ingredientes')}
           </button>
 
           <button 

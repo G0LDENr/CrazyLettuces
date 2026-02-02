@@ -10,23 +10,73 @@ const CreateEspecialForm = ({ onClose, onEspecialCreated }) => {
     activo: 'true'
   });
   const [ingredientes, setIngredientes] = useState(['']); // Array de ingredientes
+  const [ingredientesDisponibles, setIngredientesDisponibles] = useState([]); // Lista dinámica de ingredientes
   const [loading, setLoading] = useState(false);
+  const [loadingIngredientes, setLoadingIngredientes] = useState(true);
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Lista de ingredientes disponibles (puedes expandir esta lista)
-  const ingredientesDisponibles = [
-    'Limon',
-    'Chile en Polvo',
-    'Sal',
-    'Gomita Picante',
-    'Gomita Dulce',
-    'Gomitas Aciditas',
-    'Chamoy',
-    'salsa',
-    'cacahuate',
-    'Miguelito',
-  ];
+  // Cargar ingredientes desde el backend
+  useEffect(() => {
+    const fetchIngredientes = async () => {
+      try {
+        setLoadingIngredientes(true);
+        const token = localStorage.getItem('token');
+        
+        const response = await fetch('http://127.0.0.1:5000/ingredientes/', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // Filtrar solo ingredientes activos y mapear a un array de nombres
+          const ingredientesActivos = data
+            .filter(ing => ing.activo)
+            .map(ing => ing.nombre)
+            .sort(); // Ordenar alfabéticamente
+          
+          setIngredientesDisponibles(ingredientesActivos);
+        } else {
+          console.error('Error al obtener ingredientes:', response.status);
+          // Si hay error, usar lista básica como fallback
+          setIngredientesDisponibles([
+            'Limon',
+            'Chile en Polvo',
+            'Sal',
+            'Gomita Picante',
+            'Gomita Dulce',
+            'Gomitas Aciditas',
+            'Chamoy',
+            'salsa',
+            'cacahuate',
+            'Miguelito',
+          ]);
+        }
+      } catch (error) {
+        console.error('Error de conexión al obtener ingredientes:', error);
+        setIngredientesDisponibles([
+          'Limon',
+          'Chile en Polvo',
+          'Sal',
+          'Gomita Picante',
+          'Gomita Dulce',
+          'Gomitas Aciditas',
+          'Chamoy',
+          'salsa',
+          'cacahuate',
+          'Miguelito',
+        ]);
+      } finally {
+        setLoadingIngredientes(false);
+      }
+    };
+
+    fetchIngredientes();
+  }, []);
 
   // Efecto para agregar automáticamente un nuevo select cuando se selecciona un ingrediente
   useEffect(() => {
@@ -228,41 +278,57 @@ const CreateEspecialForm = ({ onClose, onEspecialCreated }) => {
         {/* Ingredientes - Selects dinámicos automáticos */}
         <div className="create-form-row">
           <div className="create-form-group create-form-group-full-width">
-            <label>Ingredientes *</label>
+            <label>
+              Ingredientes *
+              {loadingIngredientes && (
+                <span className="loading-ingredientes-text"> (Cargando ingredientes...)</span>
+              )}
+            </label>
             <div className="ingredientes-container">
-              {ingredientes.map((ingrediente, index) => (
-                <div key={index} className="ingrediente-row">
-                  <select
-                    value={ingrediente}
-                    onChange={(e) => handleIngredienteChange(index, e.target.value)}
-                    className={`create-select ${errors.ingredientes && index === 0 ? 'create-input-error' : ''}`}
-                  >
-                    <option value="">Selecciona un ingrediente</option>
-                    {ingredientesDisponibles.map((ing, i) => (
-                      <option 
-                        key={i} 
-                        value={ing}
-                        disabled={ingredientes.includes(ing) && ingrediente !== ing}
-                      >
-                        {ing}
-                      </option>
-                    ))}
-                  </select>
-                  {ingredientes.length > 1 && (
-                    <button
-                      type="button"
-                      className="remove-ingrediente-btn"
-                      onClick={() => eliminarIngrediente(index)}
-                      title="Eliminar ingrediente"
-                    >
-                      ✕
-                    </button>
-                  )}
+              {loadingIngredientes ? (
+                <div className="loading-ingredientes">
+                  <div className="spinner-small"></div>
+                  <span>Cargando lista de ingredientes...</span>
                 </div>
-              ))}
-              
-              {errors.ingredientes && (
-                <span className="create-error-message">{errors.ingredientes}</span>
+              ) : (
+                <>
+                  {ingredientes.map((ingrediente, index) => (
+                    <div key={index} className="ingrediente-row">
+                      <select
+                        value={ingrediente}
+                        onChange={(e) => handleIngredienteChange(index, e.target.value)}
+                        className={`create-select ${errors.ingredientes && index === 0 ? 'create-input-error' : ''}`}
+                        disabled={loadingIngredientes}
+                      >
+                        <option value="">Selecciona un ingrediente</option>
+                        {ingredientesDisponibles.map((ing, i) => (
+                          <option 
+                            key={i} 
+                            value={ing}
+                            disabled={ingredientes.includes(ing) && ingrediente !== ing}
+                          >
+                            {ing}
+                          </option>
+                        ))}
+                      </select>
+                      {ingredientes.length > 1 && (
+                        <button
+                          type="button"
+                          className="remove-ingrediente-btn"
+                          onClick={() => eliminarIngrediente(index)}
+                          title="Eliminar ingrediente"
+                          disabled={loadingIngredientes}
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {errors.ingredientes && (
+                    <span className="create-error-message">{errors.ingredientes}</span>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -309,14 +375,14 @@ const CreateEspecialForm = ({ onClose, onEspecialCreated }) => {
             type="button" 
             className="create-btn-cancel"
             onClick={handleCancel}
-            disabled={loading}
+            disabled={loading || loadingIngredientes}
           >
             Cancelar
           </button>
           <button 
             type="submit" 
             className="create-btn-submit"
-            disabled={loading || successMessage}
+            disabled={loading || loadingIngredientes || successMessage}
           >
             {loading ? 'Creando...' : 'Crear Especial'}
           </button>

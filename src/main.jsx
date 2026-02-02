@@ -16,6 +16,7 @@ import VerificarCodigo from './components/ordenes/verificar-codigo';
 import Productos from './components/productos/Productos';
 import Perfil from './components/perfil/Mi-Perfil';
 import NotificacionesUser from './components/notificaciones/NotificacionesUser';
+import Ingredientes from './components/Ingredientes/Ingredientes';
 
 function App() {
     return (
@@ -37,6 +38,7 @@ function App() {
                     <Route path="/productos" element={<Productos />} />
                     <Route path="/perfil" element={<Perfil />} />
                     <Route path="/notificacionesUser" element={<NotificacionesUser />} />
+                    <Route path="/ingredientes" element={<Ingredientes />} />
                 </Routes>
             </Router>
         </ConfigProvider>

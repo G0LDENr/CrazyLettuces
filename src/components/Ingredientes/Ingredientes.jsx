@@ -1,37 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import CreateEspecialForm from '../../components/especiales/create-especial';
-import EditEspecialForm from '../../components/especiales/edit-especial';
+import CreateIngredienteForm from './create-ingredientes';
+import EditIngredienteForm from './edit-ingredientes';
 import { useConfig } from '../../context/config';
-import '../../css/especiales.css';
+import '../../css/ingredientes.css';
 
 import editIcon from '../../img/edit.png';
 import deleteIcon from '../../img/delete.png';
 import activateIcon from '../../img/activate.png';
 import deactivateIcon from '../../img/deactivate.png';
 
-const Especiales = () => {
+const Ingredientes = () => {
   const { darkMode } = useConfig();
-  const [especiales, setEspeciales] = useState([]);
-  const [filteredEspeciales, setFilteredEspeciales] = useState([]);
+  const [ingredientes, setIngredientes] = useState([]);
+  const [filteredIngredientes, setFilteredIngredientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [categoriaFilter, setCategoriaFilter] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedEspecial, setSelectedEspecial] = useState(null);
-  const especialesPerPage = 7;
+  const [selectedIngrediente, setSelectedIngrediente] = useState(null);
+  const ingredientesPerPage = 10;
+  const [categorias, setCategorias] = useState([]);
 
   useEffect(() => {
-    fetchEspeciales();
+    fetchIngredientes();
+    fetchCategorias();
   }, []);
 
-  const fetchEspeciales = async () => {
+  const fetchIngredientes = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      const response = await fetch('http://127.0.0.1:5000/especiales/', {
+      const response = await fetch('http://127.0.0.1:5000/ingredientes/', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -42,15 +45,15 @@ const Especiales = () => {
       if (response.ok) {
         const data = await response.json();
         
-        const especialesWithSimpleIds = data.map((especial, index) => ({
-          ...especial,
+        const ingredientesWithSimpleIds = data.map((ingrediente, index) => ({
+          ...ingrediente,
           simpleId: index + 1
         }));
         
-        setEspeciales(especialesWithSimpleIds);
-        setFilteredEspeciales(especialesWithSimpleIds);
+        setIngredientes(ingredientesWithSimpleIds);
+        setFilteredIngredientes(ingredientesWithSimpleIds);
       } else {
-        console.error('Error al obtener especiales:', response.status);
+        console.error('Error al obtener ingredientes:', response.status);
       }
     } catch (error) {
       console.error('Error de conexión:', error);
@@ -59,40 +62,68 @@ const Especiales = () => {
     }
   };
 
+  const fetchCategorias = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch('http://127.0.0.1:5000/ingredientes/categorias', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCategorias(['todas', ...data.categorias]);
+      }
+    } catch (error) {
+      console.error('Error al obtener categorías:', error);
+      setCategorias(['todas']);
+    }
+  };
+
   useEffect(() => {
-    let filtered = especiales;
+    let filtered = ingredientes;
 
     // Filtro por término de búsqueda
     if (searchTerm.trim() !== '') {
-      filtered = filtered.filter(especial => 
-        especial.simpleId.toString().includes(searchTerm) || 
-        especial.id.toString().includes(searchTerm) ||
-        especial.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        especial.ingredientes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        especial.precio?.toString().includes(searchTerm)
+      filtered = filtered.filter(ingrediente => 
+        ingrediente.simpleId.toString().includes(searchTerm) || 
+        ingrediente.id.toString().includes(searchTerm) ||
+        ingrediente.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ingrediente.categoria?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filtro por estado
     if (statusFilter !== '') {
-      filtered = filtered.filter(especial => 
-        statusFilter === 'activo' ? especial.activo : !especial.activo
+      filtered = filtered.filter(ingrediente => 
+        statusFilter === 'activo' ? ingrediente.activo : !ingrediente.activo
+      );
+    }
+
+    // Filtro por categoría
+    if (categoriaFilter !== '' && categoriaFilter !== 'todas') {
+      filtered = filtered.filter(ingrediente => 
+        ingrediente.categoria === categoriaFilter
       );
     }
     
-    setFilteredEspeciales(filtered);
+    setFilteredIngredientes(filtered);
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, especiales]);
+  }, [searchTerm, statusFilter, categoriaFilter, ingredientes]);
 
-  const indexOfLastEspecial = currentPage * especialesPerPage;
-  const indexOfFirstEspecial = indexOfLastEspecial - especialesPerPage;
-  const currentEspeciales = filteredEspeciales.slice(indexOfFirstEspecial, indexOfLastEspecial);
-  const totalPages = Math.ceil(filteredEspeciales.length / especialesPerPage);
+  const indexOfLastIngrediente = currentPage * ingredientesPerPage;
+  const indexOfFirstIngrediente = indexOfLastIngrediente - ingredientesPerPage;
+  const currentIngredientes = filteredIngredientes.slice(indexOfFirstIngrediente, indexOfLastIngrediente);
+  const totalPages = Math.ceil(filteredIngredientes.length / ingredientesPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const handleDelete = async (especialId, especialNombre) => {
-    if (!window.confirm(`¿Estás seguro de que quieres eliminar el especial "${especialNombre}"? Esta acción no se puede deshacer.`)) {
+  const handleDelete = async (ingredienteId, ingredienteNombre) => {
+    if (!window.confirm(`¿Estás seguro de que quieres eliminar el ingrediente "${ingredienteNombre}"? Esta acción no se puede deshacer.`)) {
       return;
     }
 
@@ -100,9 +131,9 @@ const Especiales = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      console.log('🔍 DEBUG FRONTEND - Iniciando proceso de eliminación:');
-      console.log('Especial ID:', especialId);
-      console.log('Especial Nombre:', especialNombre);
+      console.log('🔍 FRONTEND - Iniciando eliminación de ingrediente:');
+      console.log('Ingrediente ID:', ingredienteId);
+      console.log('Ingrediente Nombre:', ingredienteNombre);
       
       if (!token) {
         alert('Error: No hay token de autenticación. Por favor, inicia sesión nuevamente.');
@@ -110,7 +141,7 @@ const Especiales = () => {
         return;
       }
 
-      const response = await fetch(`http://127.0.0.1:5000/especiales/${especialId}`, {
+      const response = await fetch(`http://127.0.0.1:5000/ingredientes/${ingredienteId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -121,25 +152,25 @@ const Especiales = () => {
       const responseText = await response.text();
 
       if (response.ok) {
-        console.log('✅ FRONTEND - Especial eliminado exitosamente del backend');
+        console.log('✅ FRONTEND - Ingrediente eliminado exitosamente');
         
         // Actualizar la lista local
-        const updatedEspeciales = especiales.filter(especial => especial.id !== especialId);
+        const updatedIngredientes = ingredientes.filter(ingrediente => ingrediente.id !== ingredienteId);
         
-        const especialesWithSimpleIds = updatedEspeciales.map((especial, index) => ({
-          ...especial,
+        const ingredientesWithSimpleIds = updatedIngredientes.map((ingrediente, index) => ({
+          ...ingrediente,
           simpleId: index + 1
         }));
         
-        setEspeciales(especialesWithSimpleIds);
-        setFilteredEspeciales(especialesWithSimpleIds);
+        setIngredientes(ingredientesWithSimpleIds);
+        setFilteredIngredientes(ingredientesWithSimpleIds);
         
         // Ajustar paginación si es necesario
-        if (currentEspeciales.length === 1 && currentPage > 1) {
+        if (currentIngredientes.length === 1 && currentPage > 1) {
           setCurrentPage(currentPage - 1);
         }
         
-        alert('✅ Especial eliminado exitosamente');
+        alert('✅ Ingrediente eliminado exitosamente');
       } else {
         console.error('❌ FRONTEND - Error del servidor:', response.status);
         
@@ -158,34 +189,29 @@ const Especiales = () => {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
         } else if (response.status === 403) {
-          errorMsg = 'No tienes permisos para eliminar especiales.';
+          errorMsg = 'No tienes permispos para eliminar ingredientes.';
         } else if (response.status === 404) {
-          errorMsg = 'Especial no encontrado.'; 
+          errorMsg = 'Ingrediente no encontrado.';
         }
         
-        alert(`❌ Error al eliminar especial: ${errorMsg}`);
+        alert(`❌ Error al eliminar ingrediente: ${errorMsg}`);
       }
     } catch (error) {
-      console.error('❌ FRONTEND - Error de conexión completo:', error);
-      alert('❌ Error de conexión al eliminar especial. Verifica tu conexión a internet.');
+      console.error('❌ FRONTEND - Error de conexión:', error);
+      alert('❌ Error de conexión al eliminar ingrediente. Verifica tu conexión a internet.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleToggleStatus = async (especialId, especialNombre, currentStatus) => {
+  const handleToggleStatus = async (ingredienteId, ingredienteNombre, currentStatus) => {
     const newStatus = !currentStatus;
-    const action = newStatus ? 'activar' : 'desactivar';
     
-    if (!window.confirm(`¿Estás seguro de que quieres ${action} el especial "${especialNombre}"?`)) {
-      return;
-    }
-
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`http://127.0.0.1:5000/especiales/${especialId}/toggle`, {
+      const response = await fetch(`http://127.0.0.1:5000/ingredientes/${ingredienteId}/toggle`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -196,19 +222,21 @@ const Especiales = () => {
       const responseText = await response.text();
 
       if (response.ok) {
-        console.log(`✅ FRONTEND - Especial ${action}do exitosamente`);
+        console.log(`✅ FRONTEND - Estado del ingrediente actualizado exitosamente`);
         
         // Actualizar la lista local
-        const updatedEspeciales = especiales.map(especial => 
-          especial.id === especialId 
-            ? { ...especial, activo: newStatus }
-            : especial
+        const updatedIngredientes = ingredientes.map(ingrediente => 
+          ingrediente.id === ingredienteId 
+            ? { ...ingrediente, activo: newStatus }
+            : ingrediente
         );
         
-        setEspeciales(updatedEspeciales);
-        setFilteredEspeciales(updatedEspeciales);
+        setIngredientes(updatedIngredientes);
+        setFilteredIngredientes(updatedIngredientes);
         
-        alert(`✅ Especial ${action}do exitosamente`);
+        // Mostrar mensaje de éxito
+        const statusMessage = newStatus ? 'activado' : 'desactivado';
+        alert(`✅ Ingrediente ${statusMessage} exitosamente`);
       } else {
         let errorMsg = `Error ${response.status}: ${response.statusText}`;
         try {
@@ -220,22 +248,22 @@ const Especiales = () => {
           errorMsg = responseText || errorMsg;
         }
         
-        alert(`❌ Error al ${action} especial: ${errorMsg}`);
+        alert(`❌ Error al cambiar estado del ingrediente: ${errorMsg}`);
       }
     } catch (error) {
-      console.error(`❌ FRONTEND - Error al ${action} especial:`, error);
-      alert(`❌ Error de conexión al ${action} especial. Verifica tu conexión a internet.`);
+      console.error(`❌ FRONTEND - Error al cambiar estado del ingrediente:`, error);
+      alert(`❌ Error de conexión al cambiar estado del ingrediente. Verifica tu conexión a internet.`);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (especial) => {
-    setSelectedEspecial(especial);
+  const handleEdit = (ingrediente) => {
+    setSelectedIngrediente(ingrediente);
     setShowEditModal(true);
   };
 
-  const handleAddEspecial = () => {
+  const handleAddIngrediente = () => {
     setShowCreateModal(true);
   };
 
@@ -245,14 +273,7 @@ const Especiales = () => {
 
   const closeEditModal = () => {
     setShowEditModal(false);
-    setSelectedEspecial(null);
-  };
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-MX', {
-      style: 'currency',
-      currency: 'MXN'
-    }).format(price);
+    setSelectedIngrediente(null);
   };
 
   const getStatusBadge = (activo) => {
@@ -263,29 +284,51 @@ const Especiales = () => {
     );
   };
 
-  if (loading && especiales.length === 0) {
+  const getCategoriaBadge = (categoria) => {
+    if (!categoria) return <span className="categoria-badge sin-categoria">Sin categoría</span>;
+    
+    const colores = {
+      'vegetales': 'success',
+      'proteínas': 'danger',
+      'lacteos': 'info',
+      'condimentos': 'warning',
+      'aderezos': 'primary',
+      'toppings': 'secondary',
+      'gomitas': 'purple',
+      'frutas': 'fruit',
+      'cereales': 'cereal'
+    };
+    
     return (
-      <div className={`especiales-container ${darkMode ? 'dark-mode' : ''}`}>
+      <span className={`categoria-badge ${colores[categoria] || 'default'}`}>
+        {categoria}
+      </span>
+    );
+  };
+
+  if (loading && ingredientes.length === 0) {
+    return (
+      <div className={`ingredientes-container ${darkMode ? 'dark-mode' : ''}`}>
         <div className="loading-spinner"></div>
-        <p style={{textAlign: 'center', color: darkMode ? '#e2e8f0' : '#666'}}>Cargando especiales...</p>
+        <p style={{textAlign: 'center', color: darkMode ? '#e2e8f0' : '#666'}}>Cargando ingredientes...</p>
       </div>
     );
   }
 
   return (
-    <div className={`especiales-container ${darkMode ? 'dark-mode' : ''}`}>
-      <div className="especiales-content">
+    <div className={`ingredientes-container ${darkMode ? 'dark-mode' : ''}`}>
+      <div className="ingredientes-content">
         
         {/* Header con título y botón */}
         <div className="section-header">
-          <h3>Gestión de Especiales</h3>
+          <h3>Gestión de Ingredientes</h3>
           <button 
-            className="add-especial-btn"
-            onClick={handleAddEspecial}
-            title="Agregar nuevo especial"
+            className="add-ingrediente-btn"
+            onClick={handleAddIngrediente}
+            title="Agregar nuevo ingrediente"
           >
             <span className="btn-icon">+</span>
-            Agregar Especial
+            Agregar Ingrediente
           </button>
         </div>
 
@@ -295,7 +338,7 @@ const Especiales = () => {
             <div className="search-container main-search">
               <input
                 type="text"
-                placeholder="Buscar por ID, nombre, ingredientes o precio..."
+                placeholder="Buscar por ID, nombre o categoría..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
@@ -313,6 +356,21 @@ const Especiales = () => {
 
             <div className="filter-group">
               <select 
+                value={categoriaFilter} 
+                onChange={(e) => setCategoriaFilter(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">Todas las categorías</option>
+                {categorias.map(cat => (
+                  <option key={cat} value={cat}>
+                    {cat === 'todas' ? 'Todas las categorías' : cat}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <select 
                 value={statusFilter} 
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="filter-select"
@@ -325,70 +383,63 @@ const Especiales = () => {
           </div>
         </div>
 
-        {/* Tabla de especiales */}
-        <div className="especiales-table-container">
-          <table className="especiales-table">
+        {/* Tabla de ingredientes */}
+        <div className="ingredientes-table-container">
+          <table className="ingredientes-table">
             <thead>
               <tr>
                 <th>ID</th>
                 <th>Nombre</th>
-                <th>Ingredientes</th>
-                <th>Precio</th>
+                <th>Categoría</th>
                 <th>Estado</th>
                 <th className="actions-header">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {currentEspeciales.length > 0 ? (
-                currentEspeciales.map(especial => (
-                  <tr key={especial.id}>
-                    <td className="especial-id">{especial.simpleId}</td>
-                    <td className="especial-name">{especial.nombre || 'N/A'}</td>
-                    <td className="especial-ingredientes">
-                      {especial.ingredientes ? (
-                        <span title={especial.ingredientes}>
-                          {especial.ingredientes.length > 50 
-                            ? `${especial.ingredientes.substring(0, 50)}...` 
-                            : especial.ingredientes
-                          }
-                        </span>
-                      ) : 'N/A'}
+              {currentIngredientes.length > 0 ? (
+                currentIngredientes.map(ingrediente => (
+                  <tr key={ingrediente.id}>
+                    <td className="ingrediente-id">{ingrediente.simpleId}</td>
+                    <td className="ingrediente-name">
+                      <strong>{ingrediente.nombre || 'N/A'}</strong>
                     </td>
-                    <td className="especial-price">{formatPrice(especial.precio)}</td>
-                    <td className="especial-status">
-                      {getStatusBadge(especial.activo)}
+                    <td className="ingrediente-categoria">
+                      {getCategoriaBadge(ingrediente.categoria)}
+                    </td>
+                    <td className="ingrediente-status">
+                      {getStatusBadge(ingrediente.activo)}
                     </td>
                     <td className="actions-cell">
                       <div className="actions-buttons">
                         <button 
-                          onClick={() => handleEdit(especial)}
+                          onClick={() => handleEdit(ingrediente)}
                           className="action-btn edit-btn"
-                          title="Editar especial"
+                          title="Editar ingrediente"
                         >
                           <img src={editIcon} alt="Editar" className="action-icon" />
                         </button>
                         <button 
                           onClick={() => handleToggleStatus(
-                            especial.id, 
-                            especial.nombre, 
-                            especial.activo
+                            ingrediente.id, 
+                            ingrediente.nombre, 
+                            ingrediente.activo
                           )}
                           className="action-btn status-btn"
-                          title={especial.activo ? "Desactivar especial" : "Activar especial"}
+                          title={ingrediente.activo ? "Desactivar ingrediente" : "Activar ingrediente"}
                         >
                           <img 
-                            src={especial.activo ? deactivateIcon : activateIcon} 
-                            alt={especial.activo ? "Desactivar" : "Activar"} 
+                            src={ingrediente.activo ? deactivateIcon : activateIcon} 
+                            alt={ingrediente.activo ? "Desactivar" : "Activar"} 
                             className="action-icon" 
                           />
                         </button>
                         <button 
                           onClick={() => {
-                            console.log('🖱️ Botón eliminar clickeado para especial:', especial.id, especial.nombre);
-                            handleDelete(especial.id, especial.nombre);
+                            console.log('🖱️ Botón eliminar clickeado para ingrediente:', ingrediente.id, ingrediente.nombre);
+                            handleDelete(ingrediente.id, ingrediente.nombre);
                           }}
                           className="action-btn delete-btn"
-                          title="Eliminar especial"
+                          title="Eliminar ingrediente"
                         >
                           <img src={deleteIcon} alt="Eliminar" className="action-icon" />
                         </button>
@@ -398,8 +449,8 @@ const Especiales = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="no-results">
-                    {searchTerm || statusFilter ? 'No se encontraron especiales con esos criterios' : 'No hay especiales registrados'}
+                  <td colSpan="5" className="no-results">
+                    {searchTerm || statusFilter || categoriaFilter ? 'No se encontraron ingredientes con esos criterios' : 'No hay ingredientes registrados'}
                   </td>
                 </tr>
               )}
@@ -407,7 +458,7 @@ const Especiales = () => {
           </table>
 
           {/* Paginación */}
-          {filteredEspeciales.length > especialesPerPage && (
+          {filteredIngredientes.length > ingredientesPerPage && (
             <div className="pagination-container">
               <div className="pagination-controls">
                 <button 
@@ -450,32 +501,33 @@ const Especiales = () => {
                 </button>
               </div>
 
-              <div className="especiales-count-info">
-                Mostrando {currentEspeciales.length} de {filteredEspeciales.length} especiales
+              <div className="ingredientes-count-info">
+                Mostrando {currentIngredientes.length} de {filteredIngredientes.length} ingredientes
               </div>
             </div>
           )}
 
-          {filteredEspeciales.length <= especialesPerPage && filteredEspeciales.length > 0 && (
-            <div className="especiales-count-info">
-              Mostrando {currentEspeciales.length} de {filteredEspeciales.length} especiales
+          {filteredIngredientes.length <= ingredientesPerPage && filteredIngredientes.length > 0 && (
+            <div className="ingredientes-count-info">
+              Mostrando {currentIngredientes.length} de {filteredIngredientes.length} ingredientes
             </div>
           )}
         </div>
 
-        {/* Modal para crear especial */}
+        {/* Modal para crear ingrediente */}
         {showCreateModal && (
           <div className="modal-overlay">
             <div className="modal-content">
               <div className="modal-header">
-                <h3>Agregar Nuevo Especial</h3>
+                <h3>Agregar Nuevo Ingrediente</h3>
                 <button className="close-modal" onClick={closeCreateModal}>✕</button>
               </div>
               <div className="modal-body">
-                <CreateEspecialForm 
+                <CreateIngredienteForm 
                   onClose={closeCreateModal}
-                  onEspecialCreated={() => {
-                    fetchEspeciales();
+                  onIngredienteCreated={() => {
+                    fetchIngredientes();
+                    fetchCategorias();
                   }}
                 />
               </div>
@@ -483,20 +535,21 @@ const Especiales = () => {
           </div>
         )}
 
-        {/* Modal para editar especial */}
-        {showEditModal && selectedEspecial && (
+        {/* Modal para editar ingrediente */}
+        {showEditModal && selectedIngrediente && (
           <div className="modal-overlay">
             <div className="modal-content">
               <div className="modal-header">
-                <h3>Editar Especial</h3>
+                <h3>Editar Ingrediente</h3>
                 <button className="close-modal" onClick={closeEditModal}>✕</button>
               </div>
               <div className="modal-body">
-                <EditEspecialForm 
-                  especial={selectedEspecial}
+                <EditIngredienteForm 
+                  ingrediente={selectedIngrediente}
                   onClose={closeEditModal}
-                  onEspecialUpdated={() => {
-                    fetchEspeciales();
+                  onIngredienteUpdated={() => {
+                    fetchIngredientes();
+                    fetchCategorias();
                   }}
                 />
               </div>
@@ -508,4 +561,4 @@ const Especiales = () => {
   );
 };
 
-export default Especiales;
+export default Ingredientes;

@@ -26,8 +26,7 @@ const Ordenes = () => {
   const [ordenToDelete, setOrdenToDelete] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState('');
   const [deleteDetail, setDeleteDetail] = useState('');
-  const [deleteType, setDeleteType] = useState(''); // 'success', 'warning', 'error', 'info'
-  const [showMarkAsDelivered, setShowMarkAsDelivered] = useState(false);
+  const [deleteType, setDeleteType] = useState('');
   const ordenesPerPage = 7;
 
   useEffect(() => {
@@ -74,7 +73,6 @@ const Ordenes = () => {
   useEffect(() => {
     let filtered = ordenes;
 
-    // Filtro por término de búsqueda
     if (searchTerm.trim() !== '') {
       filtered = filtered.filter(orden => 
         orden.simpleId.toString().includes(searchTerm) || 
@@ -85,7 +83,6 @@ const Ordenes = () => {
       );
     }
 
-    // Filtro por estado
     if (statusFilter !== '') {
       filtered = filtered.filter(orden => orden.estado === statusFilter);
     }
@@ -112,66 +109,6 @@ const Ordenes = () => {
     setDeleteMessage('');
     setDeleteDetail('');
     setDeleteType('');
-    setShowMarkAsDelivered(false);
-  };
-
-  const handleMarkAsDelivered = async () => {
-    if (!ordenToDelete) return;
-
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`http://127.0.0.1:5000/ordenes/${ordenToDelete.id}/estado`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ estado: 'entregado' })
-      });
-
-      if (response.ok) {
-        // Actualizar estado local
-        const updatedOrdenes = ordenes.map(orden => 
-          orden.id === ordenToDelete.id 
-            ? { ...orden, estado: 'entregado' }
-            : orden
-        );
-        
-        const ordenesWithSimpleIds = updatedOrdenes.map((orden, index) => ({
-          ...orden,
-          simpleId: index + 1
-        }));
-        
-        setOrdenes(ordenesWithSimpleIds);
-        setFilteredOrdenes(ordenesWithSimpleIds);
-        
-        setDeleteMessage('✅ Orden marcada como entregada');
-        setDeleteDetail('Ahora puedes eliminar la orden si lo deseas');
-        setDeleteType('success');
-        setShowMarkAsDelivered(false);
-        
-        // Actualizar estado de la orden a eliminar
-        setOrdenToDelete(prev => ({ ...prev, estado: 'entregado' }));
-        
-        setTimeout(() => {
-          setDeleteMessage('');
-          setDeleteDetail('');
-        }, 3000);
-      } else {
-        const errorData = await response.json();
-        setDeleteMessage('❌ Error al marcar como entregada');
-        setDeleteDetail(errorData.msg || 'Intenta nuevamente');
-        setDeleteType('error');
-      }
-    } catch (error) {
-      setDeleteMessage('❌ Error de conexión');
-      setDeleteDetail('No se pudo conectar con el servidor');
-      setDeleteType('error');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -206,7 +143,6 @@ const Ordenes = () => {
       console.log('Respuesta del servidor:', responseData);
       
       if (response.ok) {
-        // Verificar el tipo de respuesta
         if (responseData.tipo === 'eliminacion_exitosa') {
           // Eliminación física exitosa - eliminar de la lista
           const updatedOrdenes = ordenes.filter(orden => orden.id !== ordenToDelete.id);
@@ -219,12 +155,12 @@ const Ordenes = () => {
           setOrdenes(ordenesWithSimpleIds);
           setFilteredOrdenes(ordenesWithSimpleIds);
           
-          setDeleteMessage(responseData.msg || '✅ Orden eliminada permanentemente');
+          setDeleteMessage('Orden eliminada permanentemente');
           setDeleteDetail(responseData.detalle || '');
           setDeleteType('success');
         } 
         else if (responseData.tipo === 'marcada_como_eliminada') {
-          // Solo se pudo marcar como eliminada
+          // Solo se pudo marcar como eliminada (fallback)
           const updatedOrdenes = ordenes.map(orden => 
             orden.id === ordenToDelete.id 
               ? { 
@@ -244,44 +180,25 @@ const Ordenes = () => {
           setOrdenes(ordenesWithSimpleIds);
           setFilteredOrdenes(ordenesWithSimpleIds);
           
-          setDeleteMessage(responseData.msg || '⚠️ Orden marcada como eliminada');
+          setDeleteMessage('⚠️ Orden marcada como eliminada (no se pudo borrar físicamente)');
           setDeleteDetail(responseData.detalle || '');
           setDeleteType('warning');
         }
         else {
           // Respuesta genérica exitosa
-          setDeleteMessage(responseData.msg || '✅ Operación completada');
+          setDeleteMessage(responseData.msg || 'Orden eliminada');
+          setDeleteDetail('');
           setDeleteType('success');
+          
+          // Actualizar lista de todos modos
+          fetchOrdenes();
         }
         
       } else {
-        // Error del servidor - analizar tipo
-        if (responseData.tipo === 'estado_no_permitido') {
-          setDeleteMessage(`❌ No se puede eliminar: Estado "${ordenToDelete.estado}"`);
-          setDeleteDetail(responseData.detalle || '');
-          setDeleteType('info');
-          
-          // Mostrar opción para marcar como entregado si aplica
-          if (responseData.accion_recomendada === 'marcar_entregado' || 
-              responseData.accion_recomendada === 'continuar_proceso') {
-            setShowMarkAsDelivered(true);
-          }
-        }
-        else if (responseData.tipo === 'tiempo_insuficiente') {
-          setDeleteMessage('No se puede eliminar aún');
-          setDeleteDetail(responseData.detalle || '');
-          setDeleteType('info');
-        }
-        else if (responseData.tipo === 'notificaciones_activas') {
-          setDeleteMessage('⚠️ No se puede eliminar');
-          setDeleteDetail(responseData.detalle || '');
-          setDeleteType('warning');
-        }
-        else {
-          setDeleteMessage(responseData.msg || '❌ Error al procesar la solicitud');
-          setDeleteDetail(responseData.detalle || '');
-          setDeleteType('error');
-        }
+        // Error del servidor
+        setDeleteMessage(responseData.msg || '❌ Error al eliminar la orden');
+        setDeleteDetail(responseData.detalle || '');
+        setDeleteType('error');
       }
       
       // Cerrar el modal después de 3 segundos si fue exitoso
@@ -292,7 +209,6 @@ const Ordenes = () => {
           setDeleteMessage('');
           setDeleteDetail('');
           setDeleteType('');
-          setShowMarkAsDelivered(false);
         }, 3000);
       }
       
@@ -301,6 +217,11 @@ const Ordenes = () => {
       setDeleteMessage('❌ Error de conexión con el servidor');
       setDeleteDetail('No se pudo comunicar con el servidor');
       setDeleteType('error');
+      
+      setTimeout(() => {
+        setDeleteMessage('');
+        setDeleteDetail('');
+      }, 3000);
     } finally {
       setLoading(false);
     }
@@ -312,7 +233,6 @@ const Ordenes = () => {
     setDeleteMessage('');
     setDeleteDetail('');
     setDeleteType('');
-    setShowMarkAsDelivered(false);
   };
 
   const handleEdit = (orden) => {
@@ -507,7 +427,7 @@ const Ordenes = () => {
                         <button 
                           onClick={() => handleDeleteClick(orden)}
                           className="action-btn delete-btn"
-                          title={orden.estado === 'entregado' ? "Eliminar orden (entregada)" : "Marcar como entregado para eliminar"}
+                          title="Eliminar orden permanentemente"
                         >
                           <img src={deleteIcon} alt="Eliminar" className="action-icon" />
                         </button>
@@ -582,62 +502,49 @@ const Ordenes = () => {
           )}
         </div>
 
-        {/* Modal de confirmación de eliminación */}
+        {/* Modal de confirmación de eliminación DIRECTA */}
         {showDeleteConfirm && (
           <div className="modal-overlay-delete">
-            <div className="modal-content confirm-modal">
+            <div className="modal-content confirm-modal direct-modal">
               <div className="confirm-header">
-                <h3>{deleteMessage ? 'Resultado' : (ordenToDelete?.estado === 'entregado' ? 'Eliminar Orden Entregada' : 'Acción Requerida')}</h3>
+                <h3>Eliminar Orden Permanentemente</h3>
               </div>
               <div className="confirm-body">
                 {deleteMessage ? (
                   <div className={`message-container ${deleteType}`}>
                     <div className="message-icon">
                       {deleteType === 'success' ? '' : 
-                       deleteType === 'warning' ? '' : 
-                       deleteType === 'info' ? '' : ''}
+                       deleteType === 'warning' ? '' : ''}
                     </div>
                     <p className="message-text">{deleteMessage}</p>
                     {deleteDetail && (
                       <p className="message-detail">{deleteDetail}</p>
                     )}
-                    
-                    {deleteType === 'info' && (
-                      <div className="message-info">
-                        <p><strong>Reglas de eliminación:</strong></p>
-                        <ul>
-                          <li>Solo se pueden eliminar órdenes en estado <strong>"Entregado"</strong></li>
-                          <li>Debe pasar al menos 1 hora desde la entrega</li>
-                          <li>Las órdenes con notificaciones pendientes no se pueden eliminar</li>
-                        </ul>
-                      </div>
-                    )}
                   </div>
                 ) : (
                   <>
-                    <div className="confirm-icon">
-                      {ordenToDelete?.estado === 'entregado'}
-                    </div>
-                    <p className="confirm-message">
-                      {ordenToDelete?.estado === 'entregado' 
-                        ? `¿Estás seguro de que quieres eliminar permanentemente la orden ${ordenToDelete?.codigo}?`
-                        : `Para eliminar la orden ${ordenToDelete?.codigo}, primero debe estar marcada como "Entregada"`
-                      }
-                    </p>
-                    <p className="confirm-warning">
-                      {ordenToDelete?.estado === 'entregado' 
-                        ? <><strong>⚠️ Advertencia:</strong> Esta acción eliminará la orden y todas sus notificaciones asociadas. No se puede deshacer.</>
-                        : <><strong>Estado actual:</strong> {ordenToDelete?.estado}<br/>
-                           <strong>Acción requerida:</strong> Marcar como "Entregado" antes de eliminar</>
-                      }
-                    </p>
-                    
-                    {showMarkAsDelivered && (
-                      <div className="suggestion-box">
-                        <p><strong>¿Marcar como entregado?</strong></p>
-                        <p>Puedes marcar esta orden como "Entregado" ahora y luego eliminarla.</p>
+                    <div className="warning-box">
+                      <div className="warning-icon"></div>
+                      <div className="warning-content">
+                        <p><strong>¿Eliminar esta orden PERMANENTEMENTE?</strong></p>
+                        <p>Esta acción <strong>NO</strong> se puede deshacer.</p>
                       </div>
-                    )}
+                    </div>
+                    
+                    <div className="orden-info-box">
+                      <p><strong>Orden #:</strong> {ordenToDelete?.codigo}</p>
+                      <p><strong>Cliente:</strong> {ordenToDelete?.nombre}</p>
+                      <p><strong>Estado actual:</strong> {ordenToDelete?.estado}</p>
+                    </div>
+                    
+                    <div className="delete-consequences">
+                      <p><strong>Se eliminará:</strong></p>
+                      <ul>
+                        <li>La orden completa de la base de datos</li>
+                        <li>Todas las notificaciones relacionadas</li>
+                        <li>Registro de historial asociado</li>
+                      </ul>
+                    </div>
                   </>
                 )}
               </div>
@@ -651,29 +558,17 @@ const Ordenes = () => {
                     >
                       Cancelar
                     </button>
-                    
-                    {showMarkAsDelivered ? (
-                      <button 
-                        className="confirm-btn primary-btn"
-                        onClick={handleMarkAsDelivered}
-                        disabled={loading}
-                      >
-                        {loading ? 'Procesando...' : 'Marcar como Entregado'}
-                      </button>
-                    ) : (
-                      <button 
-                        className="confirm-btn delete-confirm-btn"
-                        onClick={handleDeleteConfirm}
-                        disabled={loading || (ordenToDelete?.estado !== 'entregado')}
-                      >
-                        {loading ? 'Procesando...' : 
-                         ordenToDelete?.estado === 'entregado' ? 'Sí, Eliminar' : '⚠️ Verificar Estado'}
-                      </button>
-                    )}
+                    <button 
+                      className="confirm-btn delete-permanent-btn"
+                      onClick={handleDeleteConfirm}
+                      disabled={loading}
+                    >
+                      {loading ? 'Eliminando...' : 'Sí, Eliminar Permanentemente'}
+                    </button>
                   </>
                 ) : (
                   <button 
-                    className="confirm-btn cancel-btn"
+                    className="confirm-btn close-btn"
                     onClick={handleDeleteCancel}
                   >
                     Cerrar

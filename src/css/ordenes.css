@@ -1273,6 +1273,127 @@
   line-height: 1.4;
 }
 
+/* Estilos para eliminación permanente */
+.direct-modal {
+  max-width: 450px;
+}
+
+.warning-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  background-color: #fff3cd;
+  border: 2px solid #ffc107;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.warning-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.warning-content p {
+  margin: 5px 0;
+  color: #856404;
+}
+
+.orden-info-box {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.orden-info-box p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.delete-consequences {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 15px;
+}
+
+.delete-consequences p {
+  margin: 0 0 8px 0;
+  font-weight: bold;
+  color: #721c24;
+}
+
+.delete-consequences ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.delete-consequences li {
+  font-size: 13px;
+  margin-bottom: 5px;
+  color: #721c24;
+}
+
+/* Botón de eliminación permanente */
+.delete-permanent-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.delete-permanent-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.delete-permanent-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.close-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.close-btn:hover {
+  background-color: #5a6268;
+}
+
+/* Ajustes para mensajes */
+.message-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.message-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.message-text {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.message-detail {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .ordenes-content {
