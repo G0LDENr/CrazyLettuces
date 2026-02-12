@@ -1,0 +1,355 @@
+.modal-detalle-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  padding: 20px;
+}
+
+.modal-detalle-content {
+  background-color: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-detalle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.modal-detalle-header h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.modal-detalle-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #64748b;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.modal-detalle-close:hover {
+  background-color: #ef4444;
+  color: white;
+}
+
+.modal-detalle-body {
+  padding: 25px;
+}
+
+.detalle-seccion {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.detalle-seccion:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.detalle-seccion h4 {
+  margin: 0 0 15px 0;
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.detalle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.detalle-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detalle-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.detalle-valor {
+  font-size: 0.95rem;
+  color: #0f172a;
+  font-weight: 500;
+}
+
+/* Productos */
+.productos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.producto-detalle-item {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.producto-detalle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.producto-detalle-nombre {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+
+.producto-detalle-cantidad {
+  background-color: #3b82f6;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.producto-detalle-precios {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.producto-detalle-precio-unitario {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.producto-detalle-subtotal {
+  font-weight: 600;
+  color: #059669;
+}
+
+.producto-detalle-tipo {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tipo-especial {
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.tipo-personalizado {
+  background-color: #f3e8ff;
+  color: #6b21a8;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* Dirección */
+.direccion-completa {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 15px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #334155;
+}
+
+/* Método de pago */
+.metodo-pago-detalle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.metodo-pago-nombre {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.tarjeta-info {
+  color: #64748b;
+  font-size: 0.85rem;
+  font-family: monospace;
+}
+
+.notas-pedido {
+  margin-top: 15px;
+  padding: 12px;
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #856404;
+}
+
+/* Footer */
+.modal-detalle-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-top: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+.total-container {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.total-label {
+  font-size: 1rem;
+  color: #64748b;
+}
+
+.total-valor {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #059669;
+}
+
+.btn-cerrar {
+  padding: 8px 16px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-cerrar:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+/* Estado badge */
+.estado-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.estado-badge.pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.estado-badge.preparando {
+  background-color: #cce7ff;
+  color: #004085;
+}
+
+.estado-badge.listo {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.estado-badge.entregado {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.estado-badge.cancelado {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Modo oscuro */
+.dark-mode .modal-detalle-content {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+}
+
+.dark-mode .modal-detalle-header {
+  background-color: #2d3748;
+  border-bottom-color: #4a5568;
+}
+
+.dark-mode .modal-detalle-header h3 {
+  color: #D4AF37;
+}
+
+.dark-mode .detalle-seccion {
+  border-bottom-color: #4a5568;
+}
+
+.dark-mode .detalle-label {
+  color: #a0aec0;
+}
+
+.dark-mode .detalle-valor {
+  color: #e2e8f0;
+}
+
+.dark-mode .producto-detalle-item {
+  background-color: #2d3748;
+  border-color: #4a5568;
+}
+
+.dark-mode .producto-detalle-nombre {
+  color: #e2e8f0;
+}
+
+.dark-mode .direccion-completa {
+  background-color: #2d3748;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.dark-mode .modal-detalle-footer {
+  background-color: #2d3748;
+  border-top-color: #4a5568;
+}

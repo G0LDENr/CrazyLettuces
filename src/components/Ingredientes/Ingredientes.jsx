@@ -34,7 +34,8 @@ const Ingredientes = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      const response = await fetch('http://127.0.0.1:5000/ingredientes/', {
+      // Obtener TODOS los ingredientes (activos e inactivos)
+      const response = await fetch('http://127.0.0.1:5000/ingredientes/?activos=false', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -45,6 +46,8 @@ const Ingredientes = () => {
       if (response.ok) {
         const data = await response.json();
         
+        console.log('✅ Datos recibidos del backend (todos los ingredientes):', data.length);
+        
         const ingredientesWithSimpleIds = data.map((ingrediente, index) => ({
           ...ingrediente,
           simpleId: index + 1
@@ -53,10 +56,12 @@ const Ingredientes = () => {
         setIngredientes(ingredientesWithSimpleIds);
         setFilteredIngredientes(ingredientesWithSimpleIds);
       } else {
-        console.error('Error al obtener ingredientes:', response.status);
+        console.error('❌ Error al obtener ingredientes:', response.status);
+        const errorText = await response.text();
+        console.error('❌ Detalles del error:', errorText);
       }
     } catch (error) {
-      console.error('Error de conexión:', error);
+      console.error('❌ Error de conexión:', error);
     } finally {
       setLoading(false);
     }
@@ -97,7 +102,7 @@ const Ingredientes = () => {
       );
     }
 
-    // Filtro por estado
+    // Filtro por estado - Si no hay filtro, mostrar TODOS
     if (statusFilter !== '') {
       filtered = filtered.filter(ingrediente => 
         statusFilter === 'activo' ? ingrediente.activo : !ingrediente.activo
@@ -123,7 +128,7 @@ const Ingredientes = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleDelete = async (ingredienteId, ingredienteNombre) => {
-    if (!window.confirm(`¿Estás seguro de que quieres eliminar el ingrediente "${ingredienteNombre}"? Esta acción no se puede deshacer.`)) {
+    if (!window.confirm(`¿Estás seguro de que quieres eliminar PERMANENTEMENTE el ingrediente "${ingredienteNombre}"? Esta acción no se puede deshacer.`)) {
       return;
     }
 
@@ -131,9 +136,10 @@ const Ingredientes = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      console.log('🔍 FRONTEND - Iniciando eliminación de ingrediente:');
-      console.log('Ingrediente ID:', ingredienteId);
-      console.log('Ingrediente Nombre:', ingredienteNombre);
+      console.log('🗑️ Intentando eliminar ingrediente:', {
+        id: ingredienteId,
+        nombre: ingredienteNombre
+      });
       
       if (!token) {
         alert('Error: No hay token de autenticación. Por favor, inicia sesión nuevamente.');
@@ -149,14 +155,13 @@ const Ingredientes = () => {
         }
       });
 
-      const responseText = await response.text();
-
       if (response.ok) {
-        console.log('✅ FRONTEND - Ingrediente eliminado exitosamente');
+        console.log('✅ Ingrediente eliminado exitosamente');
         
         // Actualizar la lista local
         const updatedIngredientes = ingredientes.filter(ingrediente => ingrediente.id !== ingredienteId);
         
+        // Recalcular simpleIds
         const ingredientesWithSimpleIds = updatedIngredientes.map((ingrediente, index) => ({
           ...ingrediente,
           simpleId: index + 1
@@ -172,32 +177,23 @@ const Ingredientes = () => {
         
         alert('✅ Ingrediente eliminado exitosamente');
       } else {
-        console.error('❌ FRONTEND - Error del servidor:', response.status);
+        const errorText = await response.text();
+        console.error('❌ Error del servidor:', response.status, errorText);
         
-        let errorMsg = `Error ${response.status}: ${response.statusText}`;
+        let errorMsg = `Error ${response.status}`;
         try {
-          if (responseText.trim()) {
-            const errorData = JSON.parse(responseText);
+          if (errorText.trim()) {
+            const errorData = JSON.parse(errorText);
             errorMsg = errorData.msg || errorData.message || errorData.error || errorMsg;
           }
         } catch (e) {
-          errorMsg = responseText || errorMsg;
+          errorMsg = errorText || errorMsg;
         }
         
-        if (response.status === 401) {
-          errorMsg = 'No autorizado. Token inválido o expirado.';
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-        } else if (response.status === 403) {
-          errorMsg = 'No tienes permispos para eliminar ingredientes.';
-        } else if (response.status === 404) {
-          errorMsg = 'Ingrediente no encontrado.';
-        }
-        
-        alert(`❌ Error al eliminar ingrediente: ${errorMsg}`);
+        alert(`❌ Error al eliminar ingrediente:\n\n${errorMsg}`);
       }
     } catch (error) {
-      console.error('❌ FRONTEND - Error de conexión:', error);
+      console.error('❌ Error de conexión:', error);
       alert('❌ Error de conexión al eliminar ingrediente. Verifica tu conexión a internet.');
     } finally {
       setLoading(false);
@@ -206,11 +202,23 @@ const Ingredientes = () => {
 
   const handleToggleStatus = async (ingredienteId, ingredienteNombre, currentStatus) => {
     const newStatus = !currentStatus;
+    const action = newStatus ? 'activar' : 'desactivar';
+    
+    if (!window.confirm(`¿Estás seguro de que quieres ${action} el ingrediente "${ingredienteNombre}"?`)) {
+      return;
+    }
     
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
       
+      console.log(`🔄 ${action.toUpperCase()} ingrediente:`, {
+        id: ingredienteId,
+        nombre: ingredienteNombre,
+        estadoActual: currentStatus,
+        nuevoEstado: newStatus
+      });
+
       const response = await fetch(`http://127.0.0.1:5000/ingredientes/${ingredienteId}/toggle`, {
         method: 'PUT',
         headers: {
@@ -219,12 +227,10 @@ const Ingredientes = () => {
         }
       });
 
-      const responseText = await response.text();
-
       if (response.ok) {
-        console.log(`✅ FRONTEND - Estado del ingrediente actualizado exitosamente`);
+        console.log(`✅ Estado del ingrediente actualizado exitosamente`);
         
-        // Actualizar la lista local
+        // Actualizar la lista local - mantener al ingrediente en la lista
         const updatedIngredientes = ingredientes.map(ingrediente => 
           ingrediente.id === ingredienteId 
             ? { ...ingrediente, activo: newStatus }
@@ -238,20 +244,23 @@ const Ingredientes = () => {
         const statusMessage = newStatus ? 'activado' : 'desactivado';
         alert(`✅ Ingrediente ${statusMessage} exitosamente`);
       } else {
-        let errorMsg = `Error ${response.status}: ${response.statusText}`;
+        const errorText = await response.text();
+        console.error('❌ Error toggle:', response.status, errorText);
+        
+        let errorMsg = `Error ${response.status}`;
         try {
-          if (responseText.trim()) {
-            const errorData = JSON.parse(responseText);
+          if (errorText.trim()) {
+            const errorData = JSON.parse(errorText);
             errorMsg = errorData.msg || errorData.message || errorData.error || errorMsg;
           }
         } catch (e) {
-          errorMsg = responseText || errorMsg;
+          errorMsg = errorText || errorMsg;
         }
         
-        alert(`❌ Error al cambiar estado del ingrediente: ${errorMsg}`);
+        alert(`❌ Error al cambiar estado del ingrediente:\n\n${errorMsg}`);
       }
     } catch (error) {
-      console.error(`❌ FRONTEND - Error al cambiar estado del ingrediente:`, error);
+      console.error(`❌ Error de conexión al cambiar estado:`, error);
       alert(`❌ Error de conexión al cambiar estado del ingrediente. Verifica tu conexión a internet.`);
     } finally {
       setLoading(false);
@@ -259,6 +268,7 @@ const Ingredientes = () => {
   };
 
   const handleEdit = (ingrediente) => {
+    console.log('✏️ Editando ingrediente:', ingrediente);
     setSelectedIngrediente(ingrediente);
     setShowEditModal(true);
   };
@@ -278,9 +288,15 @@ const Ingredientes = () => {
 
   const getStatusBadge = (activo) => {
     return activo ? (
-      <span className="status-badge active">Activo</span>
+      <span className="status-badge active">
+        <span className="status-dot active-dot"></span>
+        Activo
+      </span>
     ) : (
-      <span className="status-badge inactive">Inactivo</span>
+      <span className="status-badge inactive">
+        <span className="status-dot inactive-dot"></span>
+        Inactivo
+      </span>
     );
   };
 
@@ -376,8 +392,8 @@ const Ingredientes = () => {
                 className="filter-select"
               >
                 <option value="">Todos los estados</option>
-                <option value="activo">Activos</option>
-                <option value="inactivo">Inactivos</option>
+                <option value="activo">Solo activos</option>
+                <option value="inactivo">Solo inactivos</option>
               </select>
             </div>
           </div>
@@ -398,7 +414,7 @@ const Ingredientes = () => {
             <tbody>
               {currentIngredientes.length > 0 ? (
                 currentIngredientes.map(ingrediente => (
-                  <tr key={ingrediente.id}>
+                  <tr key={ingrediente.id} className={!ingrediente.activo ? 'ingrediente-inactivo' : ''}>
                     <td className="ingrediente-id">{ingrediente.simpleId}</td>
                     <td className="ingrediente-name">
                       <strong>{ingrediente.nombre || 'N/A'}</strong>
@@ -435,11 +451,14 @@ const Ingredientes = () => {
                         </button>
                         <button 
                           onClick={() => {
-                            console.log('🖱️ Botón eliminar clickeado para ingrediente:', ingrediente.id, ingrediente.nombre);
+                            console.log('🗑️ Click en eliminar:', {
+                              id: ingrediente.id,
+                              nombre: ingrediente.nombre
+                            });
                             handleDelete(ingrediente.id, ingrediente.nombre);
                           }}
                           className="action-btn delete-btn"
-                          title="Eliminar ingrediente"
+                          title="Eliminar ingrediente permanentemente"
                         >
                           <img src={deleteIcon} alt="Eliminar" className="action-icon" />
                         </button>
@@ -450,7 +469,9 @@ const Ingredientes = () => {
               ) : (
                 <tr>
                   <td colSpan="5" className="no-results">
-                    {searchTerm || statusFilter || categoriaFilter ? 'No se encontraron ingredientes con esos criterios' : 'No hay ingredientes registrados'}
+                    {searchTerm || statusFilter || categoriaFilter ? 
+                      'No se encontraron ingredientes con esos criterios' : 
+                      'No hay ingredientes registrados'}
                   </td>
                 </tr>
               )}

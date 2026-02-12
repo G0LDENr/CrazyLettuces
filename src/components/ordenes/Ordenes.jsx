@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import CreateOrdenForm from '../../components/ordenes/create-ordenes';
 import EditOrdenForm from '../../components/ordenes/edit-ordenes';
 import VerificarCodigo from '../../components/ordenes/verificar-codigo';
+import ModalDetallePedido from '../../components/ordenes/detalles-ordenes';
 import { useConfig } from '../../context/config';
 import '../../css/ordenes.css';
 
@@ -9,6 +10,7 @@ import editIcon from '../../img/edit.png';
 import deleteIcon from '../../img/delete.png';
 import verifyIcon from '../../img/verify.png';
 import refreshIcon from '../../img/actualizar.png';
+import locationIcon from '../../img/ubicacion.png';
 
 const Ordenes = () => {
   const { darkMode } = useConfig();
@@ -27,6 +29,11 @@ const Ordenes = () => {
   const [deleteMessage, setDeleteMessage] = useState('');
   const [deleteDetail, setDeleteDetail] = useState('');
   const [deleteType, setDeleteType] = useState('');
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState('');
+  const [showDetalleModal, setShowDetalleModal] = useState(false);
+  const [selectedOrdenDetalle, setSelectedOrdenDetalle] = useState(null);
+  
   const ordenesPerPage = 7;
 
   useEffect(() => {
@@ -79,7 +86,9 @@ const Ordenes = () => {
         orden.id.toString().includes(searchTerm) ||
         orden.codigo_unico?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         orden.nombre_usuario?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        orden.telefono_usuario?.includes(searchTerm)
+        orden.telefono_usuario?.includes(searchTerm) ||
+        orden.direccion_texto?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        orden.metodo_pago?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -109,6 +118,40 @@ const Ordenes = () => {
     setDeleteMessage('');
     setDeleteDetail('');
     setDeleteType('');
+  };
+
+  const handleShowAddress = (direccion) => {
+    if (direccion && direccion.trim() !== '') {
+      setSelectedAddress(direccion);
+      setShowAddressModal(true);
+    } else {
+      setSelectedAddress('No hay dirección registrada para esta orden');
+      setShowAddressModal(true);
+    }
+  };
+
+  const handleCloseAddressModal = () => {
+    setShowAddressModal(false);
+    setSelectedAddress('');
+  };
+
+  const handleCopyAddress = () => {
+    if (selectedAddress && selectedAddress !== 'No hay dirección registrada para esta orden') {
+      navigator.clipboard.writeText(selectedAddress)
+        .then(() => {
+          alert('Dirección copiada al portapapeles');
+        })
+        .catch(err => {
+          console.error('Error al copiar:', err);
+        });
+    }
+  };
+
+  const handleOpenInMaps = () => {
+    if (selectedAddress && selectedAddress !== 'No hay dirección registrada para esta orden') {
+      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedAddress)}`;
+      window.open(mapsUrl, '_blank');
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -144,7 +187,6 @@ const Ordenes = () => {
       
       if (response.ok) {
         if (responseData.tipo === 'eliminacion_exitosa') {
-          // Eliminación física exitosa - eliminar de la lista
           const updatedOrdenes = ordenes.filter(orden => orden.id !== ordenToDelete.id);
           
           const ordenesWithSimpleIds = updatedOrdenes.map((orden, index) => ({
@@ -160,14 +202,14 @@ const Ordenes = () => {
           setDeleteType('success');
         } 
         else if (responseData.tipo === 'marcada_como_eliminada') {
-          // Solo se pudo marcar como eliminada (fallback)
           const updatedOrdenes = ordenes.map(orden => 
             orden.id === ordenToDelete.id 
               ? { 
                   ...orden, 
                   estado: 'cancelado',
                   nombre_usuario: `${orden.nombre_usuario} [ELIMINADO]`,
-                  telefono_usuario: '0000000000'
+                  telefono_usuario: '0000000000',
+                  direccion_texto: '[ELIMINADA]'
                 }
               : orden
           );
@@ -180,41 +222,36 @@ const Ordenes = () => {
           setOrdenes(ordenesWithSimpleIds);
           setFilteredOrdenes(ordenesWithSimpleIds);
           
-          setDeleteMessage('⚠️ Orden marcada como eliminada (no se pudo borrar físicamente)');
+          setDeleteMessage('Orden marcada como eliminada (no se pudo borrar físicamente)');
           setDeleteDetail(responseData.detalle || '');
           setDeleteType('warning');
         }
         else {
-          // Respuesta genérica exitosa
           setDeleteMessage(responseData.msg || 'Orden eliminada');
           setDeleteDetail('');
           setDeleteType('success');
-          
-          // Actualizar lista de todos modos
           fetchOrdenes();
         }
         
+        if (response.ok) {
+          setTimeout(() => {
+            setShowDeleteConfirm(false);
+            setOrdenToDelete(null);
+            setDeleteMessage('');
+            setDeleteDetail('');
+            setDeleteType('');
+          }, 3000);
+        }
+        
       } else {
-        // Error del servidor
-        setDeleteMessage(responseData.msg || '❌ Error al eliminar la orden');
+        setDeleteMessage(responseData.msg || 'Error al eliminar la orden');
         setDeleteDetail(responseData.detalle || '');
         setDeleteType('error');
       }
       
-      // Cerrar el modal después de 3 segundos si fue exitoso
-      if (response.ok) {
-        setTimeout(() => {
-          setShowDeleteConfirm(false);
-          setOrdenToDelete(null);
-          setDeleteMessage('');
-          setDeleteDetail('');
-          setDeleteType('');
-        }, 3000);
-      }
-      
     } catch (error) {
       console.error('Error:', error);
-      setDeleteMessage('❌ Error de conexión con el servidor');
+      setDeleteMessage('Error de conexión con el servidor');
       setDeleteDetail('No se pudo comunicar con el servidor');
       setDeleteType('error');
       
@@ -261,6 +298,16 @@ const Ordenes = () => {
     setShowVerifyModal(false);
   };
 
+  const handleVerDetalle = (orden) => {
+    setSelectedOrdenDetalle(orden);
+    setShowDetalleModal(true);
+  };
+
+  const handleCloseDetalleModal = () => {
+    setShowDetalleModal(false);
+    setSelectedOrdenDetalle(null);
+  };
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-MX', {
       style: 'currency',
@@ -282,6 +329,52 @@ const Ordenes = () => {
     return <span className={`status-badge ${config.class}`}>{config.text}</span>;
   };
 
+  const getMetodoPagoDisplay = (orden) => {
+    if (!orden.metodo_pago) return 'N/A';
+    
+    let texto = orden.metodo_pago === 'efectivo' ? 'Efectivo' : 'Tarjeta';
+    
+    if (orden.metodo_pago === 'tarjeta' && orden.info_pago) {
+      texto += ` (${orden.info_pago.tipo || 'Tarjeta'} •••• ${orden.info_pago.ultimos_4 || '****'})`;
+    }
+    
+    return texto;
+  };
+
+  const getAddressDisplay = (direccion) => {
+    if (!direccion || direccion.trim() === '') {
+      return (
+        <span className="no-address" title="Sin dirección">
+          Sin dirección
+        </span>
+      );
+    } else if (direccion === '[ELIMINADA]') {
+      return (
+        <span className="deleted-address" title="Dirección eliminada">
+          Dirección eliminada
+        </span>
+      );
+    } else {
+      return (
+        <div className="address-container">
+          <span className="address-text" title={direccion}>
+            {direccion.length > 25 ? `${direccion.substring(0, 25)}...` : direccion}
+          </span>
+          <button 
+            className="view-address-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleShowAddress(direccion);
+            }}
+            title="Ver dirección completa"
+          >
+            <img src={locationIcon} alt="Ver dirección" className="address-icon" />
+          </button>
+        </div>
+      );
+    }
+  };
+
   if (loading && ordenes.length === 0) {
     return (
       <div className={`ordenes-container ${darkMode ? 'dark-mode' : ''}`}>
@@ -295,7 +388,6 @@ const Ordenes = () => {
     <div className={`ordenes-container ${darkMode ? 'dark-mode' : ''}`}>
       <div className="ordenes-content">
         
-        {/* Header con título y botones */}
         <div className="section-header">
           <h3>Gestión de Órdenes</h3>
           <div className="header-buttons">
@@ -326,13 +418,12 @@ const Ordenes = () => {
           </div>
         </div>
 
-        {/* Buscador y Filtros */}
         <div className="search-section">
           <div className="filters-row">
             <div className="search-container main-search">
               <input
                 type="text"
-                placeholder="Buscar por código, nombre o teléfono..."
+                placeholder="Buscar por código, nombre, teléfono, dirección o método de pago..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
@@ -365,7 +456,6 @@ const Ordenes = () => {
           </div>
         </div>
 
-        {/* Tabla de órdenes */}
         <div className="ordenes-table-container">
           <table className="ordenes-table">
             <thead>
@@ -374,8 +464,10 @@ const Ordenes = () => {
                 <th>Código</th>
                 <th>Cliente</th>
                 <th>Teléfono</th>
+                <th>Dirección</th>
                 <th>Tipo</th>
                 <th>Pedido</th>
+                <th>Pago</th>
                 <th>Precio</th>
                 <th>Estado</th>
                 <th className="actions-header">Acciones</th>
@@ -391,13 +483,33 @@ const Ordenes = () => {
                     </td>
                     <td className="orden-cliente">{orden.nombre_usuario || 'N/A'}</td>
                     <td className="orden-telefono">{orden.telefono_usuario || 'N/A'}</td>
+                    <td className="orden-direccion">
+                      {getAddressDisplay(orden.direccion_texto)}
+                    </td>
                     <td className="orden-tipo">
                       <span className={`tipo-badge ${orden.tipo_pedido}`}>
-                        {orden.tipo_pedido === 'especial' ? 'Especial' : 'Personalizado'}
+                        {orden.tipo_pedido === 'carrito' ? 'Carrito' : 
+                         orden.tipo_pedido === 'especial' ? 'Especial' : 'Personalizado'}
                       </span>
                     </td>
                     <td className="orden-pedido">
-                      {orden.tipo_pedido === 'especial' ? (
+                      {orden.tipo_pedido === 'carrito' ? (
+                        <span 
+                          onClick={() => handleVerDetalle(orden)}
+                          title="Ver detalles del pedido"
+                          style={{ 
+                            cursor: 'pointer',
+                            color: 'inherit',
+                            textDecoration: 'none',
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            fontWeight: 'normal'
+                          }}
+                        >
+                          Carrito
+                        </span>
+                      ) : orden.tipo_pedido === 'especial' ? (
                         orden.especial ? orden.especial.nombre : 'N/A'
                       ) : (
                         <span title={orden.ingredientes_personalizados}>
@@ -409,6 +521,11 @@ const Ordenes = () => {
                           }
                         </span>
                       )}
+                    </td>
+                    <td className="orden-pago">
+                      <span className="metodo-pago-badge">
+                        {getMetodoPagoDisplay(orden)}
+                      </span>
                     </td>
                     <td className="orden-price">{formatPrice(orden.precio)}</td>
                     <td className="orden-status">
@@ -437,7 +554,7 @@ const Ordenes = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="9" className="no-results">
+                  <td colSpan="11" className="no-results">
                     {searchTerm || statusFilter ? 'No se encontraron órdenes con esos criterios' : 'No hay órdenes registradas'}
                   </td>
                 </tr>
@@ -445,7 +562,6 @@ const Ordenes = () => {
             </tbody>
           </table>
 
-          {/* Paginación */}
           {filteredOrdenes.length > ordenesPerPage && (
             <div className="pagination-container">
               <div className="pagination-controls">
@@ -502,7 +618,51 @@ const Ordenes = () => {
           )}
         </div>
 
-        {/* Modal de confirmación de eliminación DIRECTA */}
+        {/* Modal de dirección */}
+        {showAddressModal && (
+          <div className="modal-overlay">
+            <div className="modal-content address-modal">
+              <div className="modal-header">
+                <h3>Dirección del Cliente</h3>
+                <button className="close-modal" onClick={handleCloseAddressModal}>✕</button>
+              </div>
+              <div className="modal-body">
+                <div className="address-content">
+                  <p className="address-title">Dirección completa:</p>
+                  <div className="address-display">
+                    {selectedAddress}
+                  </div>
+                  {selectedAddress && selectedAddress !== 'No hay dirección registrada para esta orden' && (
+                    <div className="address-actions">
+                      <button 
+                        className="btn btn-secondary"
+                        onClick={handleCopyAddress}
+                      >
+                        Copiar Dirección
+                      </button>
+                      <button 
+                        className="btn btn-primary"
+                        onClick={handleOpenInMaps}
+                      >
+                        Abrir en Google Maps
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  className="btn btn-close"
+                  onClick={handleCloseAddressModal}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de confirmación de eliminación */}
         {showDeleteConfirm && (
           <div className="modal-overlay-delete">
             <div className="modal-content confirm-modal direct-modal">
@@ -563,7 +723,7 @@ const Ordenes = () => {
                       onClick={handleDeleteConfirm}
                       disabled={loading}
                     >
-                      {loading ? 'Eliminando...' : 'Sí, Eliminar Permanentemente'}
+                      {loading ? 'Eliminando...' : 'Eliminar Permanentemente'}
                     </button>
                   </>
                 ) : (
@@ -651,6 +811,14 @@ const Ordenes = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Modal de detalle del pedido */}
+        {showDetalleModal && selectedOrdenDetalle && (
+          <ModalDetallePedido 
+            orden={selectedOrdenDetalle}
+            onClose={handleCloseDetalleModal}
+          />
         )}
       </div>
     </div>

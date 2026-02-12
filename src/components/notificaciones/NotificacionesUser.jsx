@@ -26,6 +26,7 @@ const NotificacionesUser = () => {
   const [showPedidoModal, setShowPedidoModal] = useState(false);
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [telefonoRestaurante] = useState('+1234567890');
   
   const notificacionesPerPage = 10;
   const API_BASE_URL = 'http://127.0.0.1:5000';
@@ -113,10 +114,6 @@ const NotificacionesUser = () => {
         return false;
       }
       
-      console.log(`🔄 Usando método masivo para marcar notificación ${notifId} como leída`);
-      
-      // SOLUCIÓN: Usar el endpoint "marcar todas" para marcar esta notificación individual
-      // Esto funciona porque el endpoint /leer-todas no verifica notificación por notificación
       const response = await fetch(`${API_BASE_URL}/notificaciones/leer-todas?user_type=cliente`, {
         method: 'PUT',
         headers: {
@@ -126,20 +123,16 @@ const NotificacionesUser = () => {
       });
       
       if (response.ok) {
-        console.log(`✅ Notificación ${notifId} marcada como leída usando endpoint masivo`);
-        
-        // Además, refrescar las notificaciones para asegurarnos de que el backend esté sincronizado
         setTimeout(() => {
           fetchNotificaciones();
         }, 500);
-        
         return true;
       } else {
-        console.warn(`⚠️ Error al usar endpoint masivo para notificación ${notifId}:`, response.status);
+        console.warn(`Error al usar endpoint masivo para notificación ${notifId}:`, response.status);
         return false;
       }
     } catch (error) {
-      console.error('❌ Error de conexión al usar endpoint masivo:', error);
+      console.error('Error de conexión al usar endpoint masivo:', error);
       return false;
     }
   };
@@ -151,11 +144,8 @@ const NotificacionesUser = () => {
       
       // 1. Si no está leída, marcarla como leída
       if (!notif.leida) {
-        // Marcar inmediatamente en frontend para feedback visual
         markAsReadFrontend(notif.id);
-        
-        // Usar el endpoint masivo (que funciona) en lugar del individual (que da 403)
-        markSingleAsReadUsingMassiveEndpoint(notif.id);
+        await markSingleAsReadUsingMassiveEndpoint(notif.id);
       }
       
       // 2. Abrir el modal
@@ -165,7 +155,6 @@ const NotificacionesUser = () => {
       const codigoPedido = notif.metadata?.codigo_pedido || extractCodigoFromTitulo(notif.titulo);
       const codigoLimpio = codigoPedido ? codigoPedido.replace(/^#/, '') : '';
       
-      // Buscar datos de la orden
       let ordenData = null;
       
       if (codigoLimpio && ordenesData[codigoLimpio]) {
@@ -174,7 +163,6 @@ const NotificacionesUser = () => {
         ordenData = await fetchOrdenDetails(codigoLimpio);
       }
       
-      // Preparar datos para mostrar en el modal
       const datosModal = {
         notificacion: { ...notif, leida: true },
         codigoPedido: codigoLimpio,
@@ -207,11 +195,9 @@ const NotificacionesUser = () => {
     const nuevaLeida = !notif.leida;
     
     if (nuevaLeida) {
-      // Si estamos marcando como leída
       markAsReadFrontend(notif.id);
       await markSingleAsReadUsingMassiveEndpoint(notif.id);
     } else {
-      // Si estamos marcando como NO leída (solo frontend, no hay endpoint para esto)
       const updatedNotificaciones = notificaciones.map(n => 
         n.id === notif.id ? { ...n, leida: false } : n
       );
@@ -223,6 +209,7 @@ const NotificacionesUser = () => {
   // Función para obtener notificaciones
   const fetchNotificaciones = async () => {
     try {
+      console.log('Iniciando fetchNotificaciones para cliente...');
       setLoading(true);
       setError(null);
       
@@ -234,7 +221,9 @@ const NotificacionesUser = () => {
         return;
       }
 
-      const url = `${API_BASE_URL}/notificaciones/usuario?user_type=cliente`;
+      // No pasar user_type, el backend lo determina por rol
+      const url = `${API_BASE_URL}/notificaciones/usuario`;
+      console.log(`URL: ${url}`);
       
       const response = await fetch(url, {
         method: 'GET',
@@ -244,8 +233,12 @@ const NotificacionesUser = () => {
         }
       });
       
+      console.log(`Status: ${response.status}`);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log(`Datos recibidos: ${data.notificaciones?.length || 0} notificaciones`);
+        
         const notifs = data.notificaciones || [];
         setNotificaciones(notifs);
         setFilteredNotificaciones(notifs);
@@ -263,9 +256,12 @@ const NotificacionesUser = () => {
       } else if (response.status === 403) {
         setError('No tienes permisos para acceder a las notificaciones.');
       } else {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
         setError(`Error ${response.status} al obtener notificaciones`);
       }
     } catch (error) {
+      console.error('Error de conexión:', error);
       setError(`Error de conexión: ${error.message}`);
     } finally {
       setLoading(false);
@@ -280,7 +276,9 @@ const NotificacionesUser = () => {
       filtered = filtered.filter(notif => 
         notif.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         notif.mensaje?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        notif.metadata?.codigo_pedido?.toLowerCase().includes(searchTerm.toLowerCase())
+        notif.metadata?.codigo_pedido?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        notif.metadata?.ingrediente_no_disponible?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        notif.metadata?.ingrediente_nombre?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -299,6 +297,7 @@ const NotificacionesUser = () => {
 
   // Función para refrescar notificaciones
   const handleRefresh = async () => {
+    console.log('Refrescando notificaciones...');
     await fetchNotificaciones();
   };
 
@@ -382,10 +381,8 @@ const NotificacionesUser = () => {
     try {
       const token = localStorage.getItem('token');
       
-      // Marcar en frontend inmediatamente para feedback visual
       markAllAsReadFrontend();
       
-      // Llamar al endpoint que SÍ funciona
       const response = await fetch(`${API_BASE_URL}/notificaciones/leer-todas?user_type=cliente`, {
         method: 'PUT',
         headers: {
@@ -395,9 +392,9 @@ const NotificacionesUser = () => {
       });
 
       if (response.ok) {
-        console.log('✅ Todas las notificaciones marcadas como leídas');
+        console.log('Todas las notificaciones marcadas como leídas');
       } else {
-        console.warn('⚠️ No se pudieron marcar todas como leídas en backend, pero se mantiene en frontend');
+        console.warn('No se pudieron marcar todas como leídas en backend');
       }
       
     } catch (error) {
@@ -427,15 +424,11 @@ const NotificacionesUser = () => {
         setNotificaciones(updatedNotificaciones);
         setFilteredNotificaciones(updatedNotificaciones);
       } else {
-        console.warn('No se pudieron eliminar las leídas del backend');
-        // Eliminar localmente de todos modos
         const updatedNotificaciones = notificaciones.filter(notif => !notif.leida);
         setNotificaciones(updatedNotificaciones);
         setFilteredNotificaciones(updatedNotificaciones);
       }
     } catch (error) {
-      console.error('Error al eliminar notificaciones leídas:', error);
-      // Eliminar localmente
       const updatedNotificaciones = notificaciones.filter(notif => !notif.leida);
       setNotificaciones(updatedNotificaciones);
       setFilteredNotificaciones(updatedNotificaciones);
@@ -482,44 +475,36 @@ const NotificacionesUser = () => {
     return '';
   };
 
-  // Función para obtener los ingredientes REALES - VERSIÓN SIMPLIFICADA
+  // Función para obtener los ingredientes REALES
   const getIngredientesReales = (notif) => {
-    // Extraer código del pedido
     const codigoPedido = notif.metadata?.codigo_pedido || extractCodigoFromTitulo(notif.titulo);
     
     if (!codigoPedido) {
-      // Si no hay código, mostrar mensaje genérico
       return "Consulta los detalles del pedido";
     }
     
-    // Buscar en los datos de órdenes ya cargados
     const codigoLimpio = codigoPedido.replace(/^#/, '');
     const ordenData = ordenesData[codigoLimpio];
     
     if (ordenData) {
-      // Si tenemos datos de la orden, extraer los ingredientes
       if (ordenData.tipo_pedido === 'personalizado' && ordenData.ingredientes_personalizados) {
         return ordenData.ingredientes_personalizados;
       } else if (ordenData.tipo_pedido === 'especial' && ordenData.especial_nombre) {
         return ordenData.especial_nombre;
       } else if (ordenData.tipo_pedido === 'especial' && ordenData.especial_id) {
-        // Si solo tenemos el ID del especial, mostrar texto genérico
         return "Especial del día";
       }
     }
     
-    // Si no tenemos datos de la orden aún, mostrar mensaje temporal
     return "Ver detalles del pedido";
   };
 
   // Función para extraer el estado del pedido
   const getEstadoPedido = (notif) => {
-    // Primero intentar obtener de metadata.estado
     if (notif.metadata?.estado) {
       return notif.metadata.estado;
     }
     
-    // Si no, intentar extraer del título o mensaje
     const textoBusqueda = (notif.titulo || "") + " " + (notif.mensaje || "");
     
     const estados = [
@@ -538,15 +523,336 @@ const NotificacionesUser = () => {
       }
     }
     
-    // Estado por defecto
     return "En proceso";
   };
 
   // Función para limpiar el código del pedido (remover #)
   const cleanCodigoPedido = (codigo) => {
     if (!codigo) return '';
-    // Remover el # si existe
     return codigo.replace(/^#/, '');
+  };
+
+  // Función para abrir WhatsApp para contactar al restaurante
+  const handleContactarRestaurante = (notif) => {
+    const codigoPedido = notif.metadata?.codigo_pedido || '';
+    const ingrediente = notif.metadata?.ingrediente_no_disponible || notif.metadata?.ingrediente_nombre || '';
+    
+    const mensaje = `Hola, tengo una consulta sobre mi pedido ${codigoPedido} porque ${ingrediente} no está disponible.`;
+    
+    const urlWhatsapp = `https://wa.me/${telefonoRestaurante}?text=${encodeURIComponent(mensaje)}`;
+    window.open(urlWhatsapp, '_blank');
+  };
+
+  // Función para renderizar notificación de ingrediente inactivo (CLIENTE)
+  const renderNotificacionIngredienteInactivoCliente = (notif) => {
+    const ingrediente = notif.metadata?.ingrediente_nombre || 'un ingrediente';
+    const especialesCount = notif.metadata?.especiales_afectados_count || 0;
+    
+    // Limpiar título de emojis y texto innecesario
+    const tituloLimpio = notif.titulo
+      .replace('INGREDIENTE INACTIVO:', '')
+      .replace('INGREDIENTE DESACTIVADO:', '')
+      .trim() || `Actualización de Menú - ${ingrediente}`;
+    
+    return (
+      <div 
+        className={`notificacionesUser-item ${notif.leida ? 'leida' : 'no-leida'} ingrediente-inactivo-item`}
+      >
+        <div className="notificacionesUser-header">
+          <div className="notificacionesUser-info">
+            <h4 className="notificacionesUser-titulo ingrediente-inactivo-titulo">
+              {tituloLimpio}
+            </h4>
+            <div className="notificacionesUser-meta">
+              <span className="notificacionesUser-fecha">
+                {formatDate(notif.fecha_creacion)}
+              </span>
+            </div>
+          </div>
+          <div className="notificacionesUser-actions">
+            {!notif.leida && (
+              <span className="notificacionesUser-badge-no-leida">
+                Nuevo
+              </span>
+            )}
+            
+            <button 
+              onClick={(e) => handleToggleReadStatus(notif, e)}
+              className="notificacionesUser-action-btn notificacionesUser-read-btn"
+              title={notif.leida ? "Marcar como no leída" : "Marcar como leída"}
+              disabled={loading}
+            >
+              <img 
+                src={readIcon} 
+                alt={notif.leida ? "Marcar no leída" : "Marcar leída"} 
+                className="notificacionesUser-action-icon" 
+              />
+            </button>
+            
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteClick(notif.id, notif.titulo);
+              }}
+              className="notificacionesUser-action-btn notificacionesUser-delete-btn"
+              title="Eliminar notificación"
+              disabled={loading}
+            >
+              <img src={deleteIcon} alt="Eliminar" className="notificacionesUser-action-icon" />
+            </button>
+          </div>
+        </div>
+        
+        <div className="notificacionesUser-mensaje ingrediente-inactivo-mensaje">
+          <p>El ingrediente <strong>{ingrediente}</strong> ya no está disponible.</p>
+          <p>Esto podría afectar algunos de nuestros especiales.</p>
+          <p>Gracias por tu comprensión.</p>
+        </div>
+        
+        {especialesCount > 0 && (
+          <div className="notificacionesUser-metadata ingrediente-inactivo-metadata">
+            <div className="notificacionesUser-metadata-item">
+              <span className="notificacionesUser-metadata-label">Especiales afectados:</span>
+              <span className="notificacionesUser-metadata-value especiales-count">
+                {especialesCount} {especialesCount === 1 ? 'especial' : 'especiales'}
+              </span>
+            </div>
+          </div>
+        )}
+        
+        <div className="notificacion-info-extra">
+          <p>Estos especiales no estarán disponibles hasta nuevo aviso.</p>
+          <p>Gracias por tu comprensión.</p>
+        </div>
+      </div>
+    );
+  };
+
+  // Función para renderizar notificación de ingrediente no disponible
+  const renderNotificacionIngredienteNoDisponible = (notif) => {
+    const ingrediente = notif.metadata?.ingrediente_no_disponible || 'un ingrediente';
+    const fecha = notif.metadata?.fecha_afectada || 'hoy';
+    const codigoPedido = cleanCodigoPedido(notif.metadata?.codigo_pedido || '');
+    const motivo = notif.metadata?.motivo || '';
+    
+    // Limpiar título
+    const tituloLimpio = notif.titulo
+      .replace(/[⚠️🚨]/g, '')
+      .replace('INGREDIENTE NO DISPONIBLE:', '')
+      .trim() || `Ingrediente no disponible - ${ingrediente}`;
+    
+    return (
+      <div 
+        className={`notificacionesUser-item ${notif.leida ? 'leida' : 'no-leida'}`}
+        onClick={() => {
+          if (notif.metadata?.accion_sugerida === 'contactar_para_cambios') {
+            handleContactarRestaurante(notif);
+          }
+        }}
+        style={{ cursor: notif.metadata?.accion_sugerida === 'contactar_para_cambios' ? 'pointer' : 'default' }}
+      >
+        <div className="notificacionesUser-header">
+          <div className="notificacionesUser-info">
+            <h4 className="notificacionesUser-titulo ingrediente-no-disponible-titulo">
+              {tituloLimpio}
+            </h4>
+            <div className="notificacionesUser-meta">
+              <span className="notificacionesUser-fecha">
+                {formatDate(notif.fecha_creacion)}
+              </span>
+            </div>
+          </div>
+          <div className="notificacionesUser-actions">
+            {!notif.leida && (
+              <span className="notificacionesUser-badge-no-leida">
+                Nuevo
+              </span>
+            )}
+            
+            <button 
+              onClick={(e) => handleToggleReadStatus(notif, e)}
+              className="notificacionesUser-action-btn notificacionesUser-read-btn"
+              title={notif.leida ? "Marcar como no leída" : "Marcar como leída"}
+              disabled={loading}
+            >
+              <img 
+                src={readIcon} 
+                alt={notif.leida ? "Marcar no leída" : "Marcar leída"} 
+                className="notificacionesUser-action-icon" 
+              />
+            </button>
+            
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteClick(notif.id, notif.titulo);
+              }}
+              className="notificacionesUser-action-btn notificacionesUser-delete-btn"
+              title="Eliminar notificación"
+              disabled={loading}
+            >
+              <img src={deleteIcon} alt="Eliminar" className="notificacionesUser-action-icon" />
+            </button>
+          </div>
+        </div>
+        
+        <div className="notificacionesUser-mensaje ingrediente-no-disponible-mensaje">
+          {notif.mensaje.replace(/[🔔📢⚠️🚨]/g, '').trim()}
+        </div>
+        
+        <div className="notificacionesUser-metadata ingrediente-no-disponible-metadata">
+          <div className="notificacionesUser-metadata-item">
+            <span className="notificacionesUser-metadata-label">Ingrediente:</span>
+            <span className="notificacionesUser-metadata-value ingrediente-afectado">
+              {ingrediente}
+            </span>
+          </div>
+          
+          {codigoPedido && (
+            <div className="notificacionesUser-metadata-item">
+              <span className="notificacionesUser-metadata-label">Pedido:</span>
+              <span className="notificacionesUser-metadata-value">
+                #{codigoPedido}
+              </span>
+            </div>
+          )}
+          
+          <div className="notificacionesUser-metadata-item">
+            <span className="notificacionesUser-metadata-label">Fecha:</span>
+            <span className="notificacionesUser-metadata-value">
+              {fecha}
+            </span>
+          </div>
+        </div>
+        
+        {notif.metadata?.accion_sugerida === 'contactar_para_cambios' && (
+          <div className="notificacion-accion-container">
+            <button 
+              className="notificacion-accion-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleContactarRestaurante(notif);
+              }}
+            >
+              Contactar para cambios
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Función para renderizar notificación normal de pedido
+  const renderNotificacionPedido = (notif) => {
+    const codigoPedido = cleanCodigoPedido(
+      notif.metadata?.codigo_pedido || 
+      extractCodigoFromTitulo(notif.titulo) || 
+      ''
+    );
+    
+    const ingredientesReales = getIngredientesReales(notif);
+    const estadoPedido = getEstadoPedido(notif);
+    
+    return (
+      <div 
+        className={`notificacionesUser-item ${notif.leida ? 'leida' : 'no-leida'}`}
+        onClick={() => handleOpenPedidoModal(notif)}
+        style={{ cursor: 'pointer' }}
+      >
+        <div className="notificacionesUser-header">
+          <div className="notificacionesUser-info">
+            <h4 className="notificacionesUser-titulo">
+              Pedido: {ingredientesReales}
+            </h4>
+            <div className="notificacionesUser-meta">
+              <span className="notificacionesUser-fecha">
+                {formatDate(notif.fecha_creacion)}
+              </span>
+            </div>
+          </div>
+          <div className="notificacionesUser-actions">
+            {!notif.leida && (
+              <span className="notificacionesUser-badge-no-leida">
+                Nuevo
+              </span>
+            )}
+            
+            <button 
+              onClick={(e) => handleToggleReadStatus(notif, e)}
+              className="notificacionesUser-action-btn notificacionesUser-read-btn"
+              title={notif.leida ? "Marcar como no leída" : "Marcar como leída"}
+              disabled={loading}
+            >
+              <img 
+                src={readIcon} 
+                alt={notif.leida ? "Marcar no leída" : "Marcar leída"} 
+                className="notificacionesUser-action-icon" 
+              />
+            </button>
+            
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteClick(notif.id, notif.titulo);
+              }}
+              className="notificacionesUser-action-btn notificacionesUser-delete-btn"
+              title="Eliminar notificación"
+              disabled={loading}
+            >
+              <img src={deleteIcon} alt="Eliminar" className="notificacionesUser-action-icon" />
+            </button>
+          </div>
+        </div>
+        
+        <div className="notificacionesUser-mensaje">
+          {notif.mensaje}
+        </div>
+        
+        <div className="notificacionesUser-metadata">
+          <div className="notificacionesUser-metadata-item">
+            <span className="notificacionesUser-metadata-label">Código:</span>
+            <span className="notificacionesUser-metadata-value">
+              {codigoPedido || "N/A"}
+            </span>
+          </div>
+          
+          <div className="notificacionesUser-metadata-item">
+            <span className="notificacionesUser-metadata-label">Estado:</span>
+            <span className="notificacionesUser-metadata-value estado-pedido">
+              {estadoPedido}
+            </span>
+          </div>
+          
+          {notif.metadata?.precio && (
+            <div className="notificacionesUser-metadata-item">
+              <span className="notificacionesUser-metadata-label">Total:</span>
+              <span className="notificacionesUser-metadata-value">${parseFloat(notif.metadata.precio).toFixed(2)}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Función para renderizar cualquier notificación según su tipo
+  const renderNotificacion = (notif) => {
+    // Ingrediente inactivo para cliente
+    if (notif.tipo === 'ingrediente_inactivo') {
+      return renderNotificacionIngredienteInactivoCliente(notif);
+    }
+    
+    // Ingrediente no disponible temporalmente
+    if (notif.tipo === 'ingrediente_no_disponible') {
+      return renderNotificacionIngredienteNoDisponible(notif);
+    }
+    
+    // Notificación normal de pedido
+    return renderNotificacionPedido(notif);
+  };
+
+  // Función para contar notificaciones por tipo
+  const contarNotificacionesPorTipo = (tipo) => {
+    return notificaciones.filter(n => n.tipo === tipo).length;
   };
 
   // Renderizar estado de carga inicial
@@ -663,7 +969,7 @@ const NotificacionesUser = () => {
             <div className="notificacionesUser-search-container notificacionesUser-main-search">
               <input
                 type="text"
-                placeholder="Buscar por código o mensaje..."
+                placeholder="Buscar por código, ingrediente o mensaje..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="notificacionesUser-search-input"
@@ -688,10 +994,13 @@ const NotificacionesUser = () => {
                 disabled={loading}
               >
                 <option value="">Todos los tipos</option>
+                <option value="estado_pedido">Actualizaciones de Pedidos</option>
                 <option value="nuevo_pedido">Nuevos Pedidos</option>
-                <option value="estado_cambiado">Actualizaciones</option>
+                <option value="estado_cambiado">Cambios de Estado</option>
                 <option value="mensaje_admin">Mensajes</option>
                 <option value="pedido_cancelado">Cancelaciones</option>
+                <option value="ingrediente_no_disponible">Ingrediente No Disponible</option>
+                <option value="ingrediente_inactivo">Ingrediente Inactivo</option>
               </select>
             </div>
 
@@ -710,7 +1019,7 @@ const NotificacionesUser = () => {
           </div>
         </div>
 
-        {/* Contador de notificaciones - SOLO TOTAL Y NO LEÍDAS */}
+        {/* Contador de notificaciones */}
         <div className="notificacionesUser-notifications-counter">
           <span className="notificacionesUser-counter-total">
             Total: <strong>{notificaciones.length}</strong>
@@ -730,101 +1039,11 @@ const NotificacionesUser = () => {
           )}
           
           {currentNotificaciones.length > 0 ? (
-            currentNotificaciones.map(notif => {
-              const codigoPedido = cleanCodigoPedido(
-                notif.metadata?.codigo_pedido || 
-                extractCodigoFromTitulo(notif.titulo) || 
-                ''
-              );
-              
-              const ingredientesReales = getIngredientesReales(notif);
-              const estadoPedido = getEstadoPedido(notif);
-              
-              return (
-                <div 
-                  key={notif.id} 
-                  className={`notificacionesUser-item ${notif.leida ? 'leida' : 'no-leida'}`}
-                  onClick={() => handleOpenPedidoModal(notif)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className="notificacionesUser-header">
-                    <div className="notificacionesUser-info">
-                      {/* TÍTULO CON INGREDIENTES REALES */}
-                      <h4 className="notificacionesUser-titulo">
-                        Pedido: {ingredientesReales}
-                      </h4>
-                      {/* FECHA ABAJO DEL TÍTULO */}
-                      <div className="notificacionesUser-meta">
-                        <span className="notificacionesUser-fecha">
-                          {formatDate(notif.fecha_creacion)}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="notificacionesUser-actions">
-                      {!notif.leida && (
-                        <span className="notificacionesUser-badge-no-leida">
-                          Nuevo
-                        </span>
-                      )}
-                      
-                      {/* Botón para marcar/desmarcar como leída */}
-                      <button 
-                        onClick={(e) => handleToggleReadStatus(notif, e)}
-                        className="notificacionesUser-action-btn notificacionesUser-read-btn"
-                        title={notif.leida ? "Marcar como no leída" : "Marcar como leída"}
-                        disabled={loading}
-                      >
-                        <img 
-                          src={readIcon} 
-                          alt={notif.leida ? "Marcar no leída" : "Marcar leída"} 
-                          className="notificacionesUser-action-icon" 
-                        />
-                      </button>
-                      
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteClick(notif.id, notif.titulo);
-                        }}
-                        className="notificacionesUser-action-btn notificacionesUser-delete-btn"
-                        title="Eliminar notificación"
-                        disabled={loading}
-                      >
-                        <img src={deleteIcon} alt="Eliminar" className="notificacionesUser-action-icon" />
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className="notificacionesUser-mensaje">
-                    {notif.mensaje}
-                  </div>
-                  
-                  {/* METADATOS ABAJO - CÓDIGO, ESTADO Y TOTAL */}
-                  <div className="notificacionesUser-metadata">
-                    <div className="notificacionesUser-metadata-item">
-                      <span className="notificacionesUser-metadata-label">Código:</span>
-                      <span className="notificacionesUser-metadata-value">
-                        {codigoPedido || "N/A"}
-                      </span>
-                    </div>
-                    
-                    <div className="notificacionesUser-metadata-item">
-                      <span className="notificacionesUser-metadata-label">Estado:</span>
-                      <span className="notificacionesUser-metadata-value estado-pedido">
-                        {estadoPedido}
-                      </span>
-                    </div>
-                    
-                    {notif.metadata?.precio && (
-                      <div className="notificacionesUser-metadata-item">
-                        <span className="notificacionesUser-metadata-label">Total:</span>
-                        <span className="notificacionesUser-metadata-value">${parseFloat(notif.metadata.precio).toFixed(2)}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })
+            currentNotificaciones.map(notif => (
+              <React.Fragment key={notif.id}>
+                {renderNotificacion(notif)}
+              </React.Fragment>
+            ))
           ) : (
             <div className="notificacionesUser-no-notificaciones">
               {loading ? 'Cargando notificaciones...' : 
@@ -835,7 +1054,7 @@ const NotificacionesUser = () => {
               {!loading && notificaciones.length === 0 && (
                 <p style={{ fontSize: '14px', color: darkMode ? '#94a3b8' : '#64748b', marginTop: '10px' }}>
                   Las notificaciones aparecerán aquí cuando recibas nuevos pedidos, 
-                  haya cambios en tus pedidos o recibas mensajes del restaurante.
+                  haya cambios en tus pedidos, ingredientes no disponibles o recibas mensajes del restaurante.
                 </p>
               )}
               {!isAuthenticated && (
@@ -963,7 +1182,6 @@ const NotificacionesUser = () => {
                   </div>
                 ) : pedidoSeleccionado ? (
                   <>
-                    {/* Código único del pedido */}
                     <div className="notificacionesUser-pedido-codigo-container">
                       <div className="notificacionesUser-pedido-codigo-label">Código del Pedido:</div>
                       <div className="notificacionesUser-pedido-codigo-value">
@@ -971,7 +1189,6 @@ const NotificacionesUser = () => {
                       </div>
                     </div>
                     
-                    {/* Información básica */}
                     <div className="notificacionesUser-pedido-info-grid">
                       <div className="notificacionesUser-pedido-info-item">
                         <span className="notificacionesUser-pedido-info-label">Fecha:</span>
@@ -997,19 +1214,16 @@ const NotificacionesUser = () => {
                       )}
                     </div>
                     
-                    {/* Detalles del pedido */}
                     <div className="notificacionesUser-pedido-detalles">
                       <h4>Detalles del Pedido:</h4>
                       
                       {pedidoSeleccionado.orden ? (
                         <div className="notificacionesUser-pedido-detalles-content">
-                          {/* Tipo de pedido */}
                           <div className="notificacionesUser-pedido-detalle-item">
                             <strong>Tipo:</strong> 
                             <span>{pedidoSeleccionado.orden.tipo_pedido === 'personalizado' ? 'Personalizado' : 'Especial'}</span>
                           </div>
                           
-                          {/* Ingredientes/Especial */}
                           <div className="notificacionesUser-pedido-detalle-item">
                             <strong>
                               {pedidoSeleccionado.orden.tipo_pedido === 'personalizado' ? 'Ingredientes:' : 'Especial:'}
@@ -1017,7 +1231,6 @@ const NotificacionesUser = () => {
                             <span>{pedidoSeleccionado.ingredientes}</span>
                           </div>
                           
-                          {/* Si es personalizado, mostrar ingredientes */}
                           {pedidoSeleccionado.orden.tipo_pedido === 'personalizado' && pedidoSeleccionado.orden.ingredientes_personalizados && (
                             <div className="notificacionesUser-pedido-ingredientes">
                               <strong>Ingredientes solicitados:</strong>
@@ -1025,7 +1238,6 @@ const NotificacionesUser = () => {
                             </div>
                           )}
                           
-                          {/* Si es especial, mostrar descripción si existe */}
                           {pedidoSeleccionado.orden.tipo_pedido === 'especial' && pedidoSeleccionado.orden.especial_descripcion && (
                             <div className="notificacionesUser-pedido-especial-desc">
                               <strong>Descripción:</strong>
@@ -1033,7 +1245,6 @@ const NotificacionesUser = () => {
                             </div>
                           )}
                           
-                          {/* Información del cliente */}
                           <div className="notificacionesUser-pedido-cliente-info">
                             <h5>Información del Cliente:</h5>
                             <div className="notificacionesUser-pedido-detalle-item">
@@ -1058,7 +1269,6 @@ const NotificacionesUser = () => {
                       )}
                     </div>
                     
-                    {/* Mensaje de la notificación */}
                     <div className="notificacionesUser-pedido-mensaje-container">
                       <h4>Mensaje:</h4>
                       <div className="notificacionesUser-pedido-mensaje-content">

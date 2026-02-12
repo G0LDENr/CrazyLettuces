@@ -60,7 +60,10 @@ export const ConfigProvider = ({ children }) => {
             combosLocos: "Combos Locos",
             contacto: "Contacto",
             direccion: "México, Ciudad de México",
-            telefono: "+52 5538986602",
+            telefono1: "Villavicencio Gonzalez Juan Carlos +52 7294030702",
+            telefono2: "Jiménez Ocampo Amanda Carolina +52 7292948980",
+            telefono3: "Arzte Neri Axel +52 7226780112",
+            telefono4: "Lopez Villar Miguel Angel +52 7226165733",
             email: "crazylettuces@gmail.com",
             derechos: "© 2024 Crazy Lettuces. Todos los derechos reservados.",
 

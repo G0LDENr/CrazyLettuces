@@ -946,6 +946,242 @@
   background: rgba(0, 0, 0, 0.7);
 }
 
+/* Estilos para modal de detalles del pedido */
+.modal-overlay-pedido {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.pedido-modal {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.dark-mode .pedido-modal {
+  background-color: #1e293b;
+  color: #e2e8f0;
+}
+
+.pedido-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.pedido-codigo-container {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.dark-mode .pedido-codigo-container {
+  background-color: #2d3748;
+}
+
+.pedido-codigo-label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.dark-mode .pedido-codigo-label {
+  color: #94a3b8;
+}
+
+.pedido-codigo-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.dark-mode .pedido-codigo-value {
+  color: #60a5fa;
+}
+
+.pedido-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.pedido-info-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.dark-mode .pedido-info-item {
+  background-color: #2d3748;
+}
+
+.pedido-info-label {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.dark-mode .pedido-info-label {
+  color: #94a3b8;
+}
+
+.pedido-info-value {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.estado-pedido {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.precio {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.pedido-detalles {
+  margin-bottom: 25px;
+}
+
+.pedido-detalles-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.dark-mode .pedido-detalles-content {
+  background-color: #2d3748;
+}
+
+.pedido-detalle-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.dark-mode .pedido-detalle-item {
+  border-bottom-color: #4a5568;
+}
+
+.pedido-detalle-item:last-child {
+  border-bottom: none;
+}
+
+.pedido-ingredientes,
+.pedido-especial-desc {
+  padding: 10px;
+  background-color: white;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.dark-mode .pedido-ingredientes,
+.dark-mode .pedido-especial-desc {
+  background-color: #374151;
+}
+
+.pedido-cliente-info {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 2px solid #dee2e6;
+}
+
+.dark-mode .pedido-cliente-info {
+  border-top-color: #4a5568;
+}
+
+.pedido-cliente-info h5 {
+  margin-bottom: 10px;
+  color: #495057;
+}
+
+.dark-mode .pedido-cliente-info h5 {
+  color: #cbd5e1;
+}
+
+.pedido-no-detalles {
+  padding: 20px;
+  text-align: center;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.dark-mode .pedido-no-detalles {
+  background-color: #2d3748;
+}
+
+.pedido-mensaje {
+  font-style: italic;
+  color: #6c757d;
+}
+
+.dark-mode .pedido-mensaje {
+  color: #94a3b8;
+}
+
+.pedido-mensaje-container {
+  padding: 15px;
+  background-color: #e9ecef;
+  border-radius: 6px;
+  margin-top: 20px;
+}
+
+.dark-mode .pedido-mensaje-container {
+  background-color: #2d3748;
+}
+
+.pedido-mensaje-content {
+  padding: 10px;
+  background-color: white;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.dark-mode .pedido-mensaje-content {
+  background-color: #374151;
+}
+
+.pedido-error {
+  text-align: center;
+  padding: 40px;
+}
+
+/* Hover effect para notificaciones clickeables */
+.notificacion-item {
+  transition: background-color 0.2s ease;
+}
+
+.notificacion-item:hover {
+  background-color: #f8f9fa !important;
+}
+
+.dark-mode .notificacion-item:hover {
+  background-color: #2d3748 !important;
+}
+
 /* Responsive - Mismo diseño */
 @media (max-width: 768px) {
   .notificaciones-content {

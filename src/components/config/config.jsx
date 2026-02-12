@@ -38,7 +38,7 @@ const Configuracion = () => {
           </div>
           <ul className="config-nav-menu">
             <li><a href="/">{t('inicio')}</a></li>
-            <li><a href="/#productos">{t('productos')}</a></li>
+            <li><a href="/productos">{t('productos')}</a></li>
             <li><a href="/nosotros">{t('nosotros')}</a></li>
             <li><a href="#configuracion">{t('configuracion')}</a></li>
             <li><a href="/login">{t('login')}</a></li>          

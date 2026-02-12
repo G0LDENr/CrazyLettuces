@@ -1,0 +1,960 @@
+/* crearPedidoModal.css */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.crear-pedido-modal {
+  background: white;
+  border-radius: 1.5rem;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+  border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.modal-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.close-modal img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.modal-body {
+  padding: 0 2rem;
+}
+
+.modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 2px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  z-index: 10;
+  border-radius: 0 0 1.5rem 1.5rem;
+}
+
+/* Progress Steps */
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem 0 3rem;
+  position: relative;
+}
+
+.progress-steps::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.step-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.step-number {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #718096;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.step-indicator.active .step-number {
+  background: var(--primary-color);
+  color: white;
+  box-shadow: 0 0 0 4px rgba(66, 153, 225, 0.1);
+}
+
+.step-label {
+  font-size: 0.875rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+.step-indicator.active .step-label {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* Step Content */
+.crear-pedido-step {
+  padding-bottom: 1.5rem;
+}
+
+.crear-pedido-step h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 1.5rem;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+}
+
+.form-section h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+}
+
+.form-row {
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  font-size: 0.9rem;
+}
+
+/* Grid de ingredientes grande */
+.ingredientes-grid-container-large {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #e2e8f0;
+}
+
+.ingredientes-grid-large {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.ingrediente-checkbox-large {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ingrediente-checkbox-large:hover {
+  border-color: var(--primary-color);
+  background: #ebf8ff;
+}
+
+.ingrediente-checkbox-large.selected {
+  border-color: var(--primary-color);
+  background: #ebf8ff;
+}
+
+.ingrediente-checkbox-large input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox-custom-large {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #cbd5e0;
+  border-radius: 4px;
+  margin-right: 12px;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.ingrediente-checkbox-large.selected .checkbox-custom-large {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.ingrediente-checkbox-large.selected .checkbox-custom-large::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.ingrediente-text-large {
+  flex-grow: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+/* Contador de ingredientes */
+.ingredientes-count {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #e2e8f0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+  text-align: center;
+}
+
+/* Vista previa de ingredientes */
+.ingredientes-preview {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f0fff4;
+  border-radius: 8px;
+  border: 1px solid #c6f6d5;
+}
+
+.ingredientes-preview strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #22543d;
+}
+
+.ingredientes-list {
+  color: #2d3748;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Price Summary */
+.price-summary {
+  background: #f7fafc;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  border: 1px solid #e2e8f0;
+}
+
+.price-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.price-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px solid #e2e8f0;
+  font-weight: 600;
+}
+
+.total-price {
+  font-size: 1.3rem;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+/* Direcciones */
+.direcciones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.direccion-item {
+  padding: 15px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.direccion-item:hover {
+  border-color: var(--primary-color);
+  background: #ebf8ff;
+}
+
+.direccion-item.selected {
+  border-color: var(--primary-color);
+  background: #ebf8ff;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.direccion-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.direccion-tipo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.direccion-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.direccion-predeterminada {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-left: 8px;
+}
+
+.direccion-info {
+  font-size: 14px;
+  color: #4a5568;
+  line-height: 1.4;
+}
+
+.direccion-info p {
+  margin-bottom: 5px;
+}
+
+.direccion-referencias {
+  font-size: 13px;
+  color: #718096;
+  font-style: italic;
+  margin-top: 5px;
+}
+
+/* Address Form Grid */
+.address-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.address-form-grid .form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Form Inputs */
+input, select, textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  background-color: white;
+  color: #2d3748;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.input-error {
+  border-color: #fc8181 !important;
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(252, 129, 129, 0.1) !important;
+}
+
+.readonly-input {
+  background-color: #f7fafc !important;
+  border-color: #cbd5e0 !important;
+  color: #718096 !important;
+  cursor: not-allowed;
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Error Messages */
+.error-message {
+  display: block;
+  margin-top: 5px;
+  color: #fc8181;
+  font-size: 0.875rem;
+}
+
+/* Auth Suggestion */
+.auth-suggestion {
+  margin-top: 10px;
+  padding: 10px;
+  background: #fff3cd;
+  border-radius: 6px;
+  border: 1px solid #ffeaa7;
+  font-size: 0.9rem;
+}
+
+.auth-suggestion .auth-link {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-left: 5px;
+  text-decoration: none;
+}
+
+.auth-suggestion .auth-link:hover {
+  text-decoration: underline;
+}
+
+/* Field Info */
+.field-info {
+  margin-top: 5px;
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+/* Order Summary */
+.order-summary {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.summary-item {
+  display: flex;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.summary-item strong {
+  min-width: 180px;
+  color: #4a5568;
+}
+
+.summary-item span, .summary-item p {
+  flex: 1;
+  color: #2d3748;
+}
+
+.ingredientes-list-summary p {
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  margin-top: 5px;
+}
+
+.address-summary {
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  margin-top: 5px;
+  line-height: 1.4;
+}
+
+.total-price-summary {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px solid #e2e8f0;
+  font-size: 1.1rem;
+}
+
+.final-price {
+  font-size: 1.4rem;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+/* Order Confirmation */
+.order-confirmation {
+  margin-top: 20px;
+  padding: 20px;
+  background: #e8f5e9;
+  border-radius: 8px;
+  border: 1px solid #c8e6c9;
+  text-align: center;
+}
+
+.confirmation-note {
+  color: #2e7d32;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Success Message */
+.success-message {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+  padding: 25px;
+  border-radius: 8px;
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.success-icon {
+  font-size: 2rem;
+  background: white;
+  color: #38a169;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.success-text {
+  flex: 1;
+}
+
+.success-subtext {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-top: 5px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading */
+.loading-ingredientes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.loading-ingredientes .spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Buttons */
+.btn-primary, .btn-secondary {
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  min-width: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--primary-dark), #16a34a);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: white;
+  color: #4a5568;
+  border: 1px solid #cbd5e0;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f7fafc;
+  border-color: #a0aec0;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirm-btn {
+  min-width: 200px;
+  font-weight: 600;
+}
+
+/* Spinner in button */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+/* Dark Mode */
+.dark-mode .crear-pedido-modal {
+  background: #212121;
+  border-color: #036513;
+}
+
+.dark-mode .modal-header {
+  background: #212121;
+  border-bottom-color: #036513;
+}
+
+.dark-mode .modal-header h2 {
+  color: #ffffff;
+}
+
+.dark-mode .modal-footer {
+  background: #212121;
+  border-top-color: #036513;
+}
+
+.dark-mode .form-section {
+  border-bottom-color: #4a5568;
+}
+
+.dark-mode .form-section h4 {
+  color: #e2e8f0;
+}
+
+.dark-mode .form-group label {
+  color: #cbd5e0;
+}
+
+.dark-mode .ingredientes-grid-container-large {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+.dark-mode .ingrediente-checkbox-large {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+.dark-mode .ingrediente-checkbox-large:hover {
+  border-color: #63b3ed;
+  background: #2d3748;
+}
+
+.dark-mode .ingrediente-checkbox-large.selected {
+  border-color: #63b3ed;
+  background: #2a4365;
+}
+
+.dark-mode .ingrediente-text-large {
+  color: #e2e8f0;
+}
+
+.dark-mode .checkbox-custom-large {
+  border-color: #718096;
+}
+
+.dark-mode .ingredientes-count {
+  background: #4a5568;
+  color: #cbd5e0;
+}
+
+.dark-mode .ingredientes-preview {
+  background: #1a202c;
+  border-color: #4a5568;
+}
+
+.dark-mode .ingredientes-preview strong {
+  color: #9ae6b4;
+}
+
+.dark-mode .ingredientes-list {
+  background: #2d3748;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.dark-mode .price-summary {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+.dark-mode .price-item {
+  border-bottom-color: #4a5568;
+}
+
+.dark-mode .price-total {
+  border-top-color: #4a5568;
+}
+
+.dark-mode .total-price {
+  color: #68d391;
+}
+
+.dark-mode .direccion-item {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+.dark-mode .direccion-item:hover {
+  border-color: #63b3ed;
+  background: #2d3748;
+}
+
+.dark-mode .direccion-item.selected {
+  border-color: #63b3ed;
+  background: #2a4365;
+}
+
+.dark-mode .direccion-tipo {
+  color: #e2e8f0;
+}
+
+.dark-mode .direccion-info {
+  color: #cbd5e0;
+}
+
+.dark-mode .direccion-referencias {
+  color: #a0aec0;
+}
+
+.dark-mode input, .dark-mode select, .dark-mode textarea {
+  background-color: #2d3748;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.dark-mode input:focus, .dark-mode select:focus, .dark-mode textarea:focus {
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.1);
+}
+
+.dark-mode .readonly-input {
+  background-color: #4a5568 !important;
+  border-color: #718096 !important;
+  color: #cbd5e0 !important;
+}
+
+.dark-mode .auth-suggestion {
+  background: #2d3748;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.dark-mode .order-summary {
+  background: #2d3748;
+  border-color: #4a5568;
+}
+
+.dark-mode .summary-item strong {
+  color: #cbd5e0;
+}
+
+.dark-mode .summary-item span, .dark-mode .summary-item p {
+  color: #e2e8f0;
+}
+
+.dark-mode .ingredientes-list-summary p,
+.dark-mode .address-summary {
+  background: #1a202c;
+  border-color: #4a5568;
+}
+
+.dark-mode .order-confirmation {
+  background: #1a202c;
+  border-color: #4a5568;
+}
+
+.dark-mode .confirmation-note {
+  color: #9ae6b4;
+}
+
+.dark-mode .btn-secondary {
+  background: #2d3748;
+  color: #cbd5e0;
+  border-color: #4a5568;
+}
+
+.dark-mode .btn-secondary:hover:not(:disabled) {
+  background: #4a5568;
+  border-color: #718096;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .crear-pedido-modal {
+    margin: 10px;
+    max-height: 95vh;
+  }
+  
+  .modal-header, .modal-body, .modal-footer {
+    padding: 1rem;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .progress-steps::before {
+    left: 15%;
+    right: 15%;
+  }
+  
+  .step-label {
+    font-size: 0.75rem;
+  }
+  
+  .ingredientes-grid-large {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  
+  .address-form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .summary-item {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .summary-item strong {
+    min-width: auto;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+  }
+  
+  .btn-primary, .btn-secondary {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .ingredientes-grid-large {
+    grid-template-columns: 1fr;
+  }
+  
+  .step-label {
+    display: none;
+  }
+  
+  .success-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 1.5rem;
+  }
+}

@@ -12,30 +12,76 @@ const EditOrdenForm = ({ orden, onClose, onOrdenUpdated }) => {
   });
   const [especiales, setEspeciales] = useState([]);
   const [ingredientesSeleccionados, setIngredientesSeleccionados] = useState([]);
+  const [ingredientesDisponibles, setIngredientesDisponibles] = useState([]); // Lista dinámica de ingredientes
   const [loading, setLoading] = useState(false);
+  const [loadingIngredientes, setLoadingIngredientes] = useState(false);
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
   const [precioCalculado, setPrecioCalculado] = useState(0);
-
-  // Lista de ingredientes disponibles
-  const ingredientesDisponibles = [
-    'Limon',
-    'Chile en Polvo',
-    'Sal',
-    'Gomita Picante',
-    'Gomita Dulce',
-    'Gomitas Aciditas',
-    'Chamoy',
-    'salsa',
-    'cacahuate',
-    'Miguelito',
-  ];
 
   // Estados disponibles
   const estadosDisponibles = ['pendiente', 'preparando', 'listo', 'entregado', 'cancelado'];
 
   // Estado original de la orden para comparar cambios
   const [estadoOriginal, setEstadoOriginal] = useState('pendiente');
+
+  // Cargar ingredientes desde el backend
+  const fetchIngredientesDisponibles = async () => {
+    try {
+      setLoadingIngredientes(true);
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch('http://127.0.0.1:5000/ingredientes/', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Filtrar solo ingredientes activos y mapear a un array de nombres
+        const ingredientesActivos = data
+          .filter(ing => ing.activo)
+          .map(ing => ing.nombre)
+          .sort(); // Ordenar alfabéticamente
+        
+        setIngredientesDisponibles(ingredientesActivos);
+      } else {
+        console.error('Error al obtener ingredientes:', response.status);
+        // Si hay error, usar lista básica como fallback
+        setIngredientesDisponibles([
+          'Limon',
+          'Chile en Polvo',
+          'Sal',
+          'Gomita Picante',
+          'Gomita Dulce',
+          'Gomitas Aciditas',
+          'Chamoy',
+          'salsa',
+          'cacahuate',
+          'Miguelito',
+        ]);
+      }
+    } catch (error) {
+      console.error('Error de conexión al obtener ingredientes:', error);
+      setIngredientesDisponibles([
+        'Limon',
+        'Chile en Polvo',
+        'Sal',
+        'Gomita Picante',
+        'Gomita Dulce',
+        'Gomitas Aciditas',
+        'Chamoy',
+        'salsa',
+        'cacahuate',
+        'Miguelito',
+      ]);
+    } finally {
+      setLoadingIngredientes(false);
+    }
+  };
 
   useEffect(() => {
     if (orden) {
@@ -63,6 +109,7 @@ const EditOrdenForm = ({ orden, onClose, onOrdenUpdated }) => {
     }
     
     fetchEspecialesActivos();
+    fetchIngredientesDisponibles(); // Cargar ingredientes al iniciar
   }, [orden]);
 
   useEffect(() => {
@@ -532,37 +579,51 @@ const EditOrdenForm = ({ orden, onClose, onOrdenUpdated }) => {
               <h4>Seleccionar Ingredientes (Opcional)</h4>
               <div className="editOrd-form-row">
                 <div className="editOrd-form-group editOrd-form-group-full-width">
-                  <label>Selecciona los ingredientes</label>
-                  <div className="editOrd-ingredientes-grid-container">
-                    <div className="editOrd-ingredientes-grid">
-                      {ingredientesDisponibles.map((ingrediente, index) => (
-                        <label key={index} className="editOrd-ingrediente-checkbox">
-                          <input
-                            type="checkbox"
-                            checked={ingredientesSeleccionados.includes(ingrediente)}
-                            onChange={() => handleIngredienteToggle(ingrediente)}
-                          />
-                          <span className="editOrd-checkbox-custom"></span>
-                          {ingrediente}
-                        </label>
-                      ))}
+                  <label>
+                    Selecciona los ingredientes
+                    {loadingIngredientes && (
+                      <span className="loading-ingredientes-text"> (Cargando ingredientes...)</span>
+                    )}
+                  </label>
+                  {loadingIngredientes ? (
+                    <div className="loading-ingredientes">
+                      <div className="spinner-small"></div>
+                      <span>Cargando lista de ingredientes...</span>
                     </div>
-                  </div>
-                  <div className="editOrd-ingredientes-count">
-                    {ingredientesSeleccionados.length} ingrediente(s) seleccionado(s)
-                  </div>
+                  ) : (
+                    <>
+                      <div className="editOrd-ingredientes-grid-container">
+                        <div className="editOrd-ingredientes-grid">
+                          {ingredientesDisponibles.map((ingrediente, index) => (
+                            <label key={index} className="editOrd-ingrediente-checkbox">
+                              <input
+                                type="checkbox"
+                                checked={ingredientesSeleccionados.includes(ingrediente)}
+                                onChange={() => handleIngredienteToggle(ingrediente)}
+                              />
+                              <span className="editOrd-checkbox-custom"></span>
+                              {ingrediente}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="editOrd-ingredientes-count">
+                        {ingredientesSeleccionados.length} ingrediente(s) seleccionado(s)
+                      </div>
+                    </>
+                  )}
+
+                  {/* Vista previa de ingredientes seleccionados */}
+                  {ingredientesSeleccionados.length > 0 && (
+                    <div className="editOrd-ingredientes-preview">
+                      <strong>Nuevos ingredientes seleccionados:</strong>
+                      <div className="editOrd-ingredientes-list">
+                        {ingredientesSeleccionados.join(', ')}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {/* Vista previa de ingredientes seleccionados */}
-              {ingredientesSeleccionados.length > 0 && (
-                <div className="editOrd-ingredientes-preview">
-                  <strong>Nuevos ingredientes seleccionados:</strong>
-                  <div className="editOrd-ingredientes-list">
-                    {ingredientesSeleccionados.join(', ')}
-                  </div>
-                </div>
-              )}
             </div>
           )}
 

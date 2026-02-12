@@ -17,6 +17,8 @@ import Productos from './components/productos/Productos';
 import Perfil from './components/perfil/Mi-Perfil';
 import NotificacionesUser from './components/notificaciones/NotificacionesUser';
 import Ingredientes from './components/Ingredientes/Ingredientes';
+import Carrito from './components/carrito/Carrito';
+import Terminos from './components/carrito/docs/politica-seguridad-pagos.md';
 
 function App() {
     return (
@@ -39,6 +41,8 @@ function App() {
                     <Route path="/perfil" element={<Perfil />} />
                     <Route path="/notificacionesUser" element={<NotificacionesUser />} />
                     <Route path="/ingredientes" element={<Ingredientes />} />
+                    <Route path="/carrito" element={<Carrito />} />
+                    <Route path="/terminos" element={<Terminos />} />
                 </Routes>
             </Router>
         </ConfigProvider>

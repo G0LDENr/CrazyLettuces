@@ -33,6 +33,12 @@ const Notificaciones = () => {
     mensaje: ''
   });
   
+  // NUEVOS ESTADOS PARA MODAL DE DETALLES
+  const [showPedidoModal, setShowPedidoModal] = useState(false);
+  const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [ordenesData, setOrdenesData] = useState({});
+  
   const notificacionesPerPage = 10;
   const API_BASE_URL = 'http://127.0.0.1:5000';
 
@@ -92,6 +98,236 @@ const Notificaciones = () => {
     return userRole === 1 ? 'admin' : 'cliente';
   };
 
+  // NUEVA FUNCIÓN: Obtener detalles de una orden específica
+  const fetchOrdenDetails = async (codigoPedido) => {
+    if (!codigoPedido) return null;
+    
+    const codigoLimpio = codigoPedido.replace(/^#/, '');
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/ordenes/codigo/${codigoLimpio}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const ordenData = await response.json();
+        setOrdenesData(prev => ({
+          ...prev,
+          [codigoLimpio]: ordenData
+        }));
+        return ordenData;
+      }
+    } catch (error) {
+      console.error('Error al obtener detalles de la orden:', error);
+    }
+    return null;
+  };
+
+  // NUEVA FUNCIÓN: Formatear fecha y hora
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'Fecha inválida';
+      }
+      
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
+    } catch (error) {
+      return 'Fecha inválida';
+    }
+  };
+
+  // NUEVA FUNCIÓN: Extraer código del pedido del título
+  const extractCodigoFromTitulo = (titulo) => {
+    if (!titulo) return '';
+    
+    const patrones = [
+      /#\s*([A-Z0-9]{4,})/i,
+      /pedido\s*#?\s*([A-Z0-9]{4,})/i,
+      /\b([A-Z0-9]{4,})\b/
+    ];
+    
+    for (const patron of patrones) {
+      const match = titulo.match(patron);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    return '';
+  };
+
+  // NUEVA FUNCIÓN: Obtener ingredientes reales
+  const getIngredientesReales = (notif) => {
+    const codigoPedido = notif.metadata?.codigo_pedido || extractCodigoFromTitulo(notif.titulo);
+    
+    if (!codigoPedido) {
+      return "Consulta los detalles del pedido";
+    }
+    
+    const codigoLimpio = codigoPedido.replace(/^#/, '');
+    const ordenData = ordenesData[codigoLimpio];
+    
+    if (ordenData) {
+      if (ordenData.tipo_pedido === 'personalizado' && ordenData.ingredientes_personalizados) {
+        return ordenData.ingredientes_personalizados;
+      } else if (ordenData.tipo_pedido === 'especial' && ordenData.especial_nombre) {
+        return ordenData.especial_nombre;
+      } else if (ordenData.tipo_pedido === 'especial' && ordenData.especial_id) {
+        return "Especial del día";
+      }
+    }
+    
+    return "Ver detalles del pedido";
+  };
+
+  // NUEVA FUNCIÓN: Obtener estado del pedido
+  const getEstadoPedido = (notif) => {
+    if (notif.metadata?.estado) {
+      return notif.metadata.estado;
+    }
+    
+    if (notif.metadata?.estado_nuevo) {
+      return notif.metadata.estado_nuevo;
+    }
+    
+    const textoBusqueda = (notif.titulo || "") + " " + (notif.mensaje || "");
+    
+    const estados = [
+      'Recibido', 'Recibida', 
+      'En preparación', 'En preparacion', 'Preparando',
+      'En proceso', 'Procesando',
+      'En camino', 
+      'En entrega', 'Saliendo para entrega',
+      'Entregado', 'Entregada',
+      'Cancelado', 'Cancelada'
+    ];
+    
+    for (const estado of estados) {
+      if (textoBusqueda.toLowerCase().includes(estado.toLowerCase())) {
+        return estado;
+      }
+    }
+    
+    return "En proceso";
+  };
+
+  // NUEVA FUNCIÓN: Limpiar código del pedido
+  const cleanCodigoPedido = (codigo) => {
+    if (!codigo) return '';
+    return codigo.replace(/^#/, '');
+  };
+
+  // NUEVA FUNCIÓN: Marcar como leída en frontend
+  const markAsReadFrontend = (notifId) => {
+    const updatedNotificaciones = notificaciones.map(n => 
+      n.id === notifId ? { ...n, leida: true } : n
+    );
+    setNotificaciones(updatedNotificaciones);
+    setFilteredNotificaciones(updatedNotificaciones);
+  };
+
+  // NUEVA FUNCIÓN: Abrir modal con detalles del pedido - VERSIÓN SIMPLIFICADA
+  const handleOpenPedidoModal = async (notif) => {
+    try {
+      console.log(`🚀 Abriendo modal para notificación ${notif.id}`);
+      setModalLoading(true);
+      
+      // 1. Marcar como leída si no lo está
+      if (!notif.leida) {
+        markAsReadFrontend(notif.id);
+        handleMarkAsRead(notif.id);
+      }
+      
+      // 2. Abrir el modal INMEDIATAMENTE
+      setShowPedidoModal(true);
+      
+      // 3. Preparar datos iniciales
+      const codigoPedido = cleanCodigoPedido(notif.metadata?.codigo_pedido || extractCodigoFromTitulo(notif.titulo) || '');
+      
+      const datosModal = {
+        notificacion: notif,
+        codigoPedido: codigoPedido,
+        orden: null,
+        fecha: formatDate(notif.fecha_creacion),
+        estado: getEstadoPedido(notif),
+        ingredientes: "Cargando detalles...",
+        precio: notif.metadata?.precio || 0
+      };
+      
+      setPedidoSeleccionado(datosModal);
+      
+      // 4. Intentar cargar más detalles en segundo plano
+      if (codigoPedido) {
+        setTimeout(async () => {
+          try {
+            const ordenData = await fetchOrdenDetails(codigoPedido);
+            if (ordenData) {
+              setPedidoSeleccionado(prev => ({
+                ...prev,
+                orden: ordenData,
+                ingredientes: getIngredientesReales({...notif, metadata: {...notif.metadata, codigo_pedido: codigoPedido}})
+              }));
+            }
+          } catch (error) {
+            console.error('Error cargando detalles adicionales:', error);
+          }
+        }, 500);
+      }
+      
+    } catch (error) {
+      console.error('Error al abrir modal:', error);
+      // Mostrar error en modal
+      setPedidoSeleccionado({
+        notificacion: notif,
+        codigoPedido: '',
+        orden: null,
+        fecha: formatDate(notif.fecha_creacion),
+        estado: 'Error',
+        ingredientes: "Error cargando detalles",
+        precio: 0
+      });
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  // NUEVA FUNCIÓN: Cerrar modal
+  const handleClosePedidoModal = () => {
+    setShowPedidoModal(false);
+    setPedidoSeleccionado(null);
+  };
+
+  // NUEVA FUNCIÓN: Manejar clic en notificación - VERSIÓN SIMPLIFICADA
+  const handleNotificationClick = (notif) => {
+    console.log(`🖱️ Click en notificación: ${notif.id} - ${notif.tipo}`);
+    
+    // Solo abrir modal para notificaciones de pedidos
+    const tiposConDetalles = ['nuevo_pedido', 'estado_cambiado', 'estado_pedido', 'pedido_cancelado'];
+    
+    if (tiposConDetalles.includes(notif.tipo)) {
+      console.log(`✅ Abriendo modal para pedido`);
+      handleOpenPedidoModal(notif);
+    } else {
+      console.log(`ℹ️ Solo marcando como leída`);
+      // Para otros tipos, solo marcar como leída si no lo está
+      if (!notif.leida) {
+        handleMarkAsRead(notif.id);
+      }
+    }
+  };
+
   // Función principal para obtener notificaciones
   const fetchNotificaciones = async () => {
     try {
@@ -132,16 +368,17 @@ const Notificaciones = () => {
         const data = await response.json();
         console.log(`📊 Datos recibidos: ${data.notificaciones?.length || 0} notificaciones`);
         
-        // Mostrar detalles de las primeras notificaciones
-        if (data.notificaciones && data.notificaciones.length > 0) {
-          console.log('📋 Primeras notificaciones recibidas:');
-          data.notificaciones.slice(0, 3).forEach((notif, i) => {
-            console.log(`   ${i+1}. ID: ${notif.id}, User ID: ${notif.user_id}, Tipo: ${notif.tipo}, Leída: ${notif.leida}`);
-          });
-        }
-        
         setNotificaciones(data.notificaciones || []);
         setFilteredNotificaciones(data.notificaciones || []);
+        
+        // Pre-cargar datos de órdenes para las notificaciones principales
+        const notifsPrincipales = data.notificaciones?.slice(0, 5) || [];
+        notifsPrincipales.forEach(notif => {
+          const codigoPedido = notif.metadata?.codigo_pedido || extractCodigoFromTitulo(notif.titulo);
+          if (codigoPedido) {
+            fetchOrdenDetails(codigoPedido);
+          }
+        });
         
       } else if (response.status === 403) {
         setError('No tienes permisos para acceder a las notificaciones.');
@@ -239,10 +476,6 @@ const Notificaciones = () => {
       console.log('   - Título:', notificacion.titulo);
       console.log('   - Ya leída?', notificacion.leida);
       
-      // Verificar si los IDs coinciden
-      console.log(`🔍 Comparación de IDs: ${notificacion.user_id} vs ${currentUserId}`);
-      console.log(`   - ¿Coinciden? ${notificacion.user_id == currentUserId}`);
-      
       // 2. PRIMERO: Actualizar SOLO ESA NOTIFICACIÓN en frontend
       console.log('🔄 Actualizando SOLO esta notificación en frontend...');
       const updatedNotificaciones = notificaciones.map(notif => 
@@ -253,9 +486,9 @@ const Notificaciones = () => {
       
       console.log(`✅ Actualizado en frontend: Notificación ${notifId} marcada como leída`);
       
-      // 3. SEGUNDO: Intentar sincronizar con backend (OPCIONAL)
+      // 3. SEGUNDO: Intentar sincronizar con backend
       try {
-        console.log(`🔄 Intentando sincronizar con backend (opcional)...`);
+        console.log(`🔄 Intentando sincronizar con backend...`);
         
         const response = await fetch(`${API_BASE_URL}/notificaciones/${notifId}/leer`, {
           method: 'PUT',
@@ -266,19 +499,12 @@ const Notificaciones = () => {
         });
         
         if (response.ok) {
-          console.log(`✅ Sincronizado con backend: Notificación ${notifId} marcada como leída`);
-        } else if (response.status === 403) {
-          console.warn(`⚠️ Error 403: No tienes permiso para esta notificación en backend`);
-          console.warn('   Esto pasa cuando el user_id de la notificación no coincide con tu user_id');
-          console.warn('   Pero la notificación SE MANTIENE MARCADA en el frontend');
-          
-          // ¡IMPORTANTE! NO llamar a ningún otro endpoint aquí
-          // Solo deja que la notificación esté marcada en frontend
+          console.log(`✅ Sincronizado con backend`);
         } else {
-          console.warn(`⚠️ Error ${response.status} del backend, pero se mantiene en frontend`);
+          console.warn(`⚠️ Error ${response.status} del backend`);
         }
       } catch (backendError) {
-        console.warn('⚠️ Error de conexión con backend, pero se mantiene en frontend');
+        console.warn('⚠️ Error de conexión con backend');
       }
       
       console.log(`=== FIN MARCADO DE NOTIFICACIÓN ${notifId} ===\n`);
@@ -377,7 +603,7 @@ const Notificaciones = () => {
     setNotificationToDelete(null);
   };
 
-  // Función para marcar TODAS como leídas (SOLO cuando se hace clic en ese botón)
+  // Función para marcar TODAS como leídas
   const handleMarkAllAsRead = async () => {
     try {
       console.log('🔄 MARCANDO TODAS LAS NOTIFICACIONES COMO LEÍDAS...');
@@ -492,8 +718,8 @@ const Notificaciones = () => {
     }
   };
 
-  // Función para formatear fecha
-  const formatDate = (dateString) => {
+  // Función para formatear fecha (versión alternativa)
+  const formatDateAlternative = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('es-MX', {
       year: 'numeric',
@@ -517,6 +743,10 @@ const Notificaciones = () => {
         return 'Mensaje';
       case 'pedido_cancelado':
         return 'Pedido Cancelado';
+      case 'ingrediente_inactivo':
+        return 'Ingrediente Inactivo';
+      case 'ingrediente_no_disponible':
+        return 'Ingrediente No Disponible';
       default:
         return tipo;
     }
@@ -535,9 +765,176 @@ const Notificaciones = () => {
         return '#6f42c1';
       case 'pedido_cancelado':
         return '#dc3545';
+      case 'ingrediente_inactivo':
+        return '#ffc107';
+      case 'ingrediente_no_disponible':
+        return '#fd7e14';
       default:
         return '#666';
     }
+  };
+
+  // Función para renderizar notificación
+  const renderNotificacion = (notif) => {
+    const tiposConDetalles = ['nuevo_pedido', 'estado_cambiado', 'estado_pedido', 'pedido_cancelado'];
+    const tieneDetalles = tiposConDetalles.includes(notif.tipo);
+    const cursorStyle = tieneDetalles ? 'pointer' : 'default';
+    
+    return (
+      <div 
+        key={notif.id} 
+        className={`notificacion-item ${notif.leida ? 'leida' : 'no-leida'}`}
+        style={{ 
+          borderLeftColor: getNotificationColor(notif.tipo),
+          cursor: cursorStyle
+        }}
+        onClick={() => {
+          console.log(`📱 Click en notificación: ${notif.id}`);
+          handleNotificationClick(notif);
+        }}
+      >
+        <div className="notificacion-header">
+          <div className="notificacion-icon">
+            <div className="notification-type-indicator" style={{ backgroundColor: getNotificationColor(notif.tipo) }}></div>
+          </div>
+          <div className="notificacion-info">
+            <h4 className="notificacion-titulo">{notif.titulo}</h4>
+            <div className="notificacion-meta">
+              <span className="notificacion-tipo">
+                {getNotificationTypeText(notif.tipo)}
+              </span>
+              <span className="notificacion-fecha">
+                {formatDate(notif.fecha_creacion)}
+              </span>
+              {notif.hace_cuanto && (
+                <span className="notificacion-timeago">
+                  ({notif.hace_cuanto})
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="notificacion-actions">
+            {!notif.leida && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log(`🎯 Click en marcar como leída - ID: ${notif.id}`);
+                  handleMarkAsRead(notif.id);
+                }}
+                className="action-btn mark-read-btn"
+                title="Marcar como leída"
+                disabled={loading}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  backgroundColor: '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '16px',
+                  fontWeight: 'bold'
+                }}
+              >
+                ✓
+              </button>
+            )}
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteClick(notif.id, notif.titulo);
+              }}
+              className="action-btn delete-btn"
+              title="Eliminar notificación"
+              disabled={loading}
+              style={{
+                width: '32px',
+                height: '32px',
+                backgroundColor: '#dc3545',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <img 
+                src={deleteIcon} 
+                alt="Eliminar" 
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  filter: 'invert(1)'
+                }} 
+              />
+            </button>
+          </div>
+        </div>
+        
+        <div className="notificacion-mensaje">
+          {notif.mensaje}
+        </div>
+        
+        {notif.metadata && Object.keys(notif.metadata).length > 0 && (
+          <div className="notificacion-metadata">
+            {notif.metadata.codigo_pedido && (
+              <div className="metadata-item">
+                <span className="metadata-label">Pedido:</span>
+                <span className="metadata-value">{notif.metadata.codigo_pedido}</span>
+              </div>
+            )}
+            {notif.metadata.cliente_nombre && (
+              <div className="metadata-item">
+                <span className="metadata-label">Cliente:</span>
+                <span className="metadata-value">{notif.metadata.cliente_nombre}</span>
+              </div>
+            )}
+            {notif.metadata.precio && (
+              <div className="metadata-item">
+                <span className="metadata-label">Precio:</span>
+                <span className="metadata-value">${parseFloat(notif.metadata.precio).toFixed(2)}</span>
+              </div>
+            )}
+            {notif.metadata.estado_nuevo && (
+              <div className="metadata-item">
+                <span className="metadata-label">Estado:</span>
+                <span className="metadata-value">{notif.metadata.estado_nuevo}</span>
+              </div>
+            )}
+            {notif.metadata.remitente && (
+              <div className="metadata-item">
+                <span className="metadata-label">De:</span>
+                <span className="metadata-value">{notif.metadata.remitente}</span>
+              </div>
+            )}
+            {notif.metadata.ingrediente_no_disponible && (
+              <div className="metadata-item">
+                <span className="metadata-label">Ingrediente:</span>
+                <span className="metadata-value">{notif.metadata.ingrediente_no_disponible}</span>
+              </div>
+            )}
+            {notif.metadata.ingrediente_nombre && (
+              <div className="metadata-item">
+                <span className="metadata-label">Ingrediente:</span>
+                <span className="metadata-value">{notif.metadata.ingrediente_nombre}</span>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Indicador visual para notificaciones clickeables */}
+        {tieneDetalles && !notif.leida && (
+          <div className="click-indicator">
+            <span className="click-hint">Haz clic para ver detalles</span>
+          </div>
+        )}
+      </div>
+    );
   };
 
   // Renderizar estado de carga inicial
@@ -674,6 +1071,8 @@ const Notificaciones = () => {
                 <option value="estado_pedido">Estado de Pedidos</option>
                 <option value="mensaje_admin">Mensajes</option>
                 <option value="pedido_cancelado">Pedidos Cancelados</option>
+                <option value="ingrediente_no_disponible">Ingrediente No Disponible</option>
+                <option value="ingrediente_inactivo">Ingrediente Inactivo</option>
               </select>
             </div>
 
@@ -716,133 +1115,9 @@ const Notificaciones = () => {
           
           {currentNotificaciones.length > 0 ? (
             currentNotificaciones.map(notif => (
-              <div 
-                key={notif.id} 
-                className={`notificacion-item ${notif.leida ? 'leida' : 'no-leida'}`}
-                style={{ borderLeftColor: getNotificationColor(notif.tipo) }}
-              >
-                <div className="notificacion-header">
-                  <div className="notificacion-icon">
-                    <div className="notification-type-indicator" style={{ backgroundColor: getNotificationColor(notif.tipo) }}></div>
-                  </div>
-                  <div className="notificacion-info">
-                    <h4 className="notificacion-titulo">{notif.titulo}</h4>
-                    <div className="notificacion-meta">
-                      <span className="notificacion-tipo">
-                        {getNotificationTypeText(notif.tipo)}
-                      </span>
-                      <span className="notificacion-fecha">
-                        {formatDate(notif.fecha_creacion)}
-                      </span>
-                      {notif.hace_cuanto && (
-                        <span className="notificacion-timeago">
-                          ({notif.hace_cuanto})
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="notificacion-actions">
-                    {!notif.leida && (
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          console.log(`🎯 Click en marcar como leída - ID: ${notif.id}`);
-                          handleMarkAsRead(notif.id);
-                        }}
-                        className="action-btn mark-read-btn"
-                        title="Marcar como leída"
-                        disabled={loading}
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          backgroundColor: '#28a745',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '16px',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        ✓
-                      </button>
-                    )}
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick(notif.id, notif.titulo);
-                      }}
-                      className="action-btn delete-btn"
-                      title="Eliminar notificación"
-                      disabled={loading}
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <img 
-                        src={deleteIcon} 
-                        alt="Eliminar" 
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          filter: 'invert(1)'
-                        }} 
-                      />
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="notificacion-mensaje">
-                  {notif.mensaje}
-                </div>
-                
-                {notif.metadata && Object.keys(notif.metadata).length > 0 && (
-                  <div className="notificacion-metadata">
-                    {notif.metadata.codigo_pedido && (
-                      <div className="metadata-item">
-                        <span className="metadata-label">Pedido:</span>
-                        <span className="metadata-value">{notif.metadata.codigo_pedido}</span>
-                      </div>
-                    )}
-                    {notif.metadata.cliente_nombre && (
-                      <div className="metadata-item">
-                        <span className="metadata-label">Cliente:</span>
-                        <span className="metadata-value">{notif.metadata.cliente_nombre}</span>
-                      </div>
-                    )}
-                    {notif.metadata.precio && (
-                      <div className="metadata-item">
-                        <span className="metadata-label">Precio:</span>
-                        <span className="metadata-value">${parseFloat(notif.metadata.precio).toFixed(2)}</span>
-                      </div>
-                    )}
-                    {notif.metadata.estado_nuevo && (
-                      <div className="metadata-item">
-                        <span className="metadata-label">Estado:</span>
-                        <span className="metadata-value">{notif.metadata.estado_nuevo}</span>
-                      </div>
-                    )}
-                    {notif.metadata.remitente && (
-                      <div className="metadata-item">
-                        <span className="metadata-label">De:</span>
-                        <span className="metadata-value">{notif.metadata.remitente}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              <React.Fragment key={notif.id}>
+                {renderNotificacion(notif)}
+              </React.Fragment>
             ))
           ) : (
             <div className="no-notificaciones">
@@ -946,6 +1221,160 @@ const Notificaciones = () => {
                   onClick={handleDeleteConfirm}
                 >
                   Sí, Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de detalles del pedido */}
+        {showPedidoModal && (
+          <div className="modal-overlay-pedido">
+            <div className="modal-content large-modal pedido-modal">
+              <div className="modal-header">
+                <h3>Detalles del Pedido</h3>
+                <button 
+                  className="close-modal" 
+                  onClick={handleClosePedidoModal}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    color: darkMode ? '#e2e8f0' : '#333'
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="modal-body">
+                {modalLoading ? (
+                  <div className="pedido-loading">
+                    <div className="loading-spinner small"></div>
+                    <p>Cargando información del pedido...</p>
+                  </div>
+                ) : pedidoSeleccionado ? (
+                  <>
+                    <div className="pedido-codigo-container">
+                      <div className="pedido-codigo-label">Código del Pedido:</div>
+                      <div className="pedido-codigo-value">
+                        {pedidoSeleccionado.codigoPedido || "N/A"}
+                      </div>
+                    </div>
+                    
+                    <div className="pedido-info-grid">
+                      <div className="pedido-info-item">
+                        <span className="pedido-info-label">Fecha:</span>
+                        <span className="pedido-info-value">
+                          {pedidoSeleccionado.fecha}
+                        </span>
+                      </div>
+                      
+                      <div className="pedido-info-item">
+                        <span className="pedido-info-label">Estado:</span>
+                        <span className="pedido-info-value estado-pedido">
+                          {pedidoSeleccionado.estado}
+                        </span>
+                      </div>
+                      
+                      {pedidoSeleccionado.precio > 0 && (
+                        <div className="pedido-info-item">
+                          <span className="pedido-info-label">Total:</span>
+                          <span className="pedido-info-value precio">
+                            ${parseFloat(pedidoSeleccionado.precio).toFixed(2)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="pedido-detalles">
+                      <h4>Detalles del Pedido:</h4>
+                      
+                      {pedidoSeleccionado.orden ? (
+                        <div className="pedido-detalles-content">
+                          <div className="pedido-detalle-item">
+                            <strong>Tipo:</strong> 
+                            <span>{pedidoSeleccionado.orden.tipo_pedido === 'personalizado' ? 'Personalizado' : 'Especial'}</span>
+                          </div>
+                          
+                          <div className="pedido-detalle-item">
+                            <strong>
+                              {pedidoSeleccionado.orden.tipo_pedido === 'personalizado' ? 'Ingredientes:' : 'Especial:'}
+                            </strong>
+                            <span>{pedidoSeleccionado.ingredientes}</span>
+                          </div>
+                          
+                          {pedidoSeleccionado.orden.tipo_pedido === 'personalizado' && pedidoSeleccionado.orden.ingredientes_personalizados && (
+                            <div className="pedido-ingredientes">
+                              <strong>Ingredientes solicitados:</strong>
+                              <p>{pedidoSeleccionado.orden.ingredientes_personalizados}</p>
+                            </div>
+                          )}
+                          
+                          {pedidoSeleccionado.orden.tipo_pedido === 'especial' && pedidoSeleccionado.orden.especial_descripcion && (
+                            <div className="pedido-especial-desc">
+                              <strong>Descripción:</strong>
+                              <p>{pedidoSeleccionado.orden.especial_descripcion}</p>
+                            </div>
+                          )}
+                          
+                          <div className="pedido-cliente-info">
+                            <h5>Información del Cliente:</h5>
+                            <div className="pedido-detalle-item">
+                              <strong>Nombre:</strong>
+                              <span>{pedidoSeleccionado.orden.nombre_usuario || 'No disponible'}</span>
+                            </div>
+                            {pedidoSeleccionado.orden.telefono_usuario && (
+                              <div className="pedido-detalle-item">
+                                <strong>Teléfono:</strong>
+                                <span>{pedidoSeleccionado.orden.telefono_usuario}</span>
+                              </div>
+                            )}
+                            {pedidoSeleccionado.orden.direccion_usuario && (
+                              <div className="pedido-detalle-item">
+                                <strong>Dirección:</strong>
+                                <span>{pedidoSeleccionado.orden.direccion_usuario}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="pedido-no-detalles">
+                          <p>No se encontraron detalles adicionales del pedido.</p>
+                          <p className="pedido-mensaje">
+                            <strong>Mensaje:</strong> {pedidoSeleccionado.notificacion?.mensaje}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="pedido-mensaje-container">
+                      <h4>Mensaje:</h4>
+                      <div className="pedido-mensaje-content">
+                        {pedidoSeleccionado.notificacion?.mensaje}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="pedido-error">
+                    <p>Error al cargar los detalles del pedido.</p>
+                    <button 
+                      onClick={handleClosePedidoModal}
+                      className="pedido-btn-cerrar"
+                    >
+                      Cerrar
+                    </button>
+                  </div>
+                )}
+              </div>
+              
+              <div className="modal-actions">
+                <button 
+                  onClick={handleClosePedidoModal}
+                  className="btn btn-secondary"
+                >
+                  Cerrar
                 </button>
               </div>
             </div>

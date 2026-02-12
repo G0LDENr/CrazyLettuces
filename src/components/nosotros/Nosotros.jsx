@@ -40,7 +40,7 @@ const Nosotros = () => {
           </div>
           <ul className="nosotros-nav-menu">
             <li><a href="/">{t('inicio')}</a></li>
-            <li><a href="/#productos">{t('productos')}</a></li>
+            <li><a href="/productos">{t('productos')}</a></li>
             <li><a href="#nosotros">{t('nosotros')}</a></li>
             <li><a href="/configuracion">{t('configuracion')}</a></li>
             <li><a href="/login">{t('login')}</a></li>
@@ -228,7 +228,10 @@ const Nosotros = () => {
               <h4>{t('contacto')}</h4>
               <ul>
                 <li><i className="fas fa-map-marker-alt"></i> {t('direccion')}</li>
-                <li><i className="fas fa-phone"></i> {t('telefono')}</li>
+                <li><i className="fas fa-phone"></i> {t('telefono1')}</li>
+                <li><i className="fas fa-phone"></i> {t('telefono2')}</li>
+                <li><i className="fas fa-phone"></i> {t('telefono3')}</li>
+                <li><i className="fas fa-phone"></i> {t('telefono4')}</li>
                 <li><i className="fas fa-envelope"></i> {t('email')}</li>
               </ul>
             </div>

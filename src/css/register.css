@@ -522,7 +522,442 @@
     color: #2E7D32 !important;
 }
 
+/* ==============================
+   ESTILOS PARA PAGINACIÓN Y DIRECCIONES
+   ============================== */
 
+/* Indicador de pasos */
+.step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+    gap: 10px;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.step.active {
+    opacity: 1;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    color: #4a5568;
+    transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+    background: #267416;
+    color: white;
+}
+
+.dark-mode .step-number {
+    background: #4a5568;
+    color: #e2e8f0;
+}
+
+.dark-mode .step.active .step-number {
+    background: #2E7D32;
+    color: white;
+}
+
+.step-label {
+    font-size: 12px;
+    color: #718096;
+    font-weight: 500;
+    text-align: center;
+}
+
+.step.active .step-label {
+    color: #267416;
+    font-weight: 600;
+}
+
+.dark-mode .step-label {
+    color: #cbd5e0;
+}
+
+.dark-mode .step.active .step-label {
+    color: #2E7D32;
+}
+
+.step-connector {
+    width: 40px;
+    height: 2px;
+    background: #e2e8f0;
+    margin: 0 5px;
+}
+
+.dark-mode .step-connector {
+    background: #4a5568;
+}
+
+/* Navegación entre pasos */
+.step-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.step-button {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+}
+
+.prev-button {
+    background: #e2e8f0;
+    color: #4a5568;
+    border: 1px solid #cbd5e0;
+}
+
+.dark-mode .prev-button {
+    background: #4a5568;
+    color: #e2e8f0;
+    border-color: #718096;
+}
+
+.prev-button:hover:not(:disabled) {
+    background: #cbd5e0;
+    transform: translateY(-1px);
+}
+
+.dark-mode .prev-button:hover:not(:disabled) {
+    background: #718096;
+}
+
+.next-button, .register-button {
+    background: #191a1c;
+    color: white;
+}
+
+.dark-mode .next-button,
+.dark-mode .register-button {
+    background: #267416;
+    color: white;
+    border: 1px solid #2E7D32;
+}
+
+.next-button:hover:not(:disabled),
+.register-button:hover:not(:disabled) {
+    background: #2E7D32;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .next-button:hover:not(:disabled),
+.dark-mode .register-button:hover:not(:disabled) {
+    background: #2E7D32;
+    border-color: #267416;
+}
+
+.step-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Formulario de direcciones */
+.direccion-form {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.dark-mode .direccion-form {
+    background: #2a2a2a;
+    border-color: #4a5568;
+}
+
+.direccion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.dark-mode .direccion-header {
+    border-bottom-color: #4a5568;
+}
+
+.direccion-header h3 {
+    font-size: 1rem;
+    color: #2b2d42;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dark-mode .direccion-header h3 {
+    color: #ffffff;
+}
+
+.predeterminada-badge {
+    background: #48bb78;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dark-mode .predeterminada-badge {
+    background: #2E7D32;
+}
+
+.remove-direccion-button {
+    background: #fed7d7;
+    color: #c53030;
+    border: none;
+    border-radius: 4px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dark-mode .remove-direccion-button {
+    background: #742a2a;
+    color: #fed7d7;
+}
+
+.remove-direccion-button:hover:not(:disabled) {
+    background: #feb2b2;
+    transform: scale(1.1);
+}
+
+.dark-mode .remove-direccion-button:hover:not(:disabled) {
+    background: #9b2c2c;
+}
+
+.remove-direccion-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Grid de direcciones */
+.direccion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.direccion-grid .form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.direccion-grid .checkbox-group {
+    grid-column: 1 / -1;
+    margin-top: 10px;
+}
+
+/* Botón para agregar dirección */
+.add-direccion-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.add-direccion-button {
+    padding: 12px 20px;
+    background: transparent;
+    color: #267416;
+    border: 2px dashed #267416;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dark-mode .add-direccion-button {
+    color: #48bb78;
+    border-color: #48bb78;
+}
+
+.add-direccion-button:hover:not(:disabled) {
+    background: rgba(38, 116, 22, 0.1);
+    border-style: solid;
+    transform: translateY(-1px);
+}
+
+.dark-mode .add-direccion-button:hover:not(:disabled) {
+    background: rgba(72, 187, 120, 0.2);
+}
+
+.add-direccion-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Estilos para checkbox personalizado */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #4a5568;
+    user-select: none;
+}
+
+.dark-mode .checkbox-label {
+    color: #cbd5e0;
+}
+
+.checkbox-label input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-custom {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #cbd5e0;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.dark-mode .checkbox-custom {
+    border-color: #718096;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
+    background: #267416;
+    border-color: #267416;
+}
+
+.dark-mode .checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
+    background: #2E7D32;
+    border-color: #2E7D32;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '✓';
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.checkbox-label:hover .checkbox-custom {
+    border-color: #267416;
+}
+
+.dark-mode .checkbox-label:hover .checkbox-custom {
+    border-color: #2E7D32;
+}
+
+/* Estilos para textarea */
+textarea.form-input {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+/* Responsive para formulario de direcciones */
+@media (max-width: 768px) {
+    .direccion-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .step-indicator {
+        gap: 5px;
+    }
+    
+    .step-connector {
+        width: 20px;
+    }
+    
+    .step-label {
+        font-size: 10px;
+    }
+    
+    .step-navigation {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .step-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .direccion-form {
+        padding: 15px;
+    }
+    
+    .direccion-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .remove-direccion-button {
+        align-self: flex-end;
+    }
+}
+
+/* Ajustes para móviles */
+@media (max-width: 380px) {
+    .step-number {
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+    }
+    
+    .step-label {
+        display: none;
+    }
+    
+    .step-connector {
+        width: 15px;
+    }
+}
 
 /* Media Queries para tablets y escritorio */
 @media (min-width: 768px) {
